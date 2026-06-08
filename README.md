@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KaamSetu
+
+**Local Work. Trusted People.**
+
+KaamSetu is a PWA-first platform connecting customers with trusted local workers for home services. Built as a single Next.js application with strict module boundaries for future extraction.
+
+## Stack
+
+- **Next.js 16** (App Router) + TypeScript + Tailwind CSS
+- **Supabase** (PostgreSQL + Storage + Auth)
+- **Vercel** deployment
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure environment
+
+```bash
+cp .env.example .env.local
+```
+
+Fill in Supabase credentials and `TRACK_CODE_PEPPER`.
+
+### 3. Run database migrations
+
+Apply SQL files in `supabase/migrations/` to your Supabase project (see `supabase/README.md`).
+
+### 4. Start development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```text
+app/           # Next.js App Router (public, worker, admin, api)
+components/    # Shared presentational UI
+features/      # Feature modules (actions, schemas, queries, types)
+lib/           # Generic utilities, constants, validation
+server/        # Business logic, auth, db clients, state machines
+supabase/      # SQL migrations and seed data
+types/         # Shared TypeScript types
+tests/         # Vitest unit + Playwright E2E
+docs/          # Architecture docs and AI context packs
+```
 
-## Learn More
+See [KS-011](docs/KS-011-Repository-Structure-and-Engineering-Standards-v1.0.md) for full standards.
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server |
+| `npm run build` | Production build |
+| `npm run lint` | ESLint |
+| `npm run test` | Vitest unit tests |
+| `npm run test:e2e` | Playwright E2E tests |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Architecture Rules
 
-## Deploy on Vercel
+1. Pages call feature actions → server modules → Supabase
+2. No business logic in page components
+3. Service role key is server-only
+4. Every mutation logs to `activity_logs`
+5. State transitions use centralized state machines
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Documentation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `docs/KS-011` — Repository structure & engineering standards
+- `docs/KS-012` — Supabase SQL migration pack
+- `docs/KS-008` — API contracts
+- `docs/context/` — AI agent context packs
+
+## MVP Scope
+
+Included: invite-gated requests, worker onboarding, admin dispatch, payments, ratings, complaints.
+
+Excluded: wallet, chat, maps, native apps, AI matching, ads.

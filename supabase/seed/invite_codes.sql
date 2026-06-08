@@ -1,0 +1,5 @@
+-- Dev seed: invite codes — create via admin panel after Sprint 2
+-- Example (do not run in production without founder approval):
+--
+-- insert into public.invite_codes (code, code_type, max_uses, is_active)
+-- values ('BETA2026', 'customer', 100, true);
