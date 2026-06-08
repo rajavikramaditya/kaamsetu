@@ -1,0 +1,1 @@
+-- Reference seed for localities (see 009_seed_data.sql)

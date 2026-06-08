@@ -1,0 +1,16 @@
+export const LIMITS = {
+  phoneDigits: 10,
+  descriptionMinLength: 20,
+  descriptionMaxLength: 500,
+  reviewMaxLength: 300,
+  addressMinLength: 10,
+  addressMaxLength: 250,
+  maxJobPhotos: 3,
+  maxFileSizeBytes: 5 * 1024 * 1024,
+  ratingMin: 1,
+  ratingMax: 5,
+  publicApiRatePerMinute: 10,
+  trackingRatePerHour: 20,
+  inviteValidationPerDay: 20,
+  complaintsPerDay: 5,
+} as const;

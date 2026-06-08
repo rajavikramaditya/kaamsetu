@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KaamSetu
 
-## Getting Started
+**Local Work. Trusted People.**
 
-First, run the development server:
+KaamSetu is a PWA-first local services platform for Orai, Uttar Pradesh. This repository follows the engineering standards in `docs/KS-011-Repository-Structure-and-Engineering-Standards-v1.0.md`.
+
+## Stack
+
+- Next.js 16 (App Router) + TypeScript
+- Tailwind CSS 4
+- Supabase (PostgreSQL, Auth, Storage)
+- Vercel
+- Vitest + Playwright
+
+## Project structure
+
+```text
+app/           Next.js routes (public, worker, admin, api)
+components/    Shared presentational UI
+features/      Feature modules (actions, queries, schemas, types)
+server/        Business logic, auth, Supabase clients
+lib/           Generic utilities and constants
+types/         Shared enums and API types
+supabase/      SQL migrations and seed references
+docs/          Architecture documents and AI context packs
+tests/         Unit and E2E tests
+```
+
+## Getting started
+
+1. Copy environment template:
+
+```bash
+cp .env.example .env.local
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only service role key |
+| `TRACK_CODE_PEPPER` | Server-only HMAC pepper for tracking codes |
+| `APP_ENV` | `development` or `production` |
+| `APP_BASE_URL` | Public app URL |
+| `ADMIN_BOOTSTRAP_EMAIL` | Initial admin bootstrap email |
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server |
+| `npm run build` | Production build |
+| `npm run lint` | ESLint |
+| `npm test` | Vitest unit tests |
+| `npm run test:e2e` | Playwright E2E tests |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Architecture rules
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Pages are thin — call feature actions, not Supabase directly.
+2. Three Supabase clients: browser, server, admin (server-only).
+3. All APIs return `{ success, data }` or `{ success, error }`.
+4. State transitions live in `server/state-machines/`.
+5. Every mutation must call `logActivity()`.
 
-## Deploy on Vercel
+## Documentation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Engineering standards: `docs/KS-011-Repository-Structure-and-Engineering-Standards-v1.0.md`
+- Build tasks: `docs/KS-013-Build-Task-Pack-v1.0.md`
+- AI context packs: `docs/context/`
+- Database migrations: `supabase/README.md`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Current status
+
+**Sprint 0 complete** — repository foundation and boilerplate are in place. Feature implementation begins in Sprint 1 (Supabase setup) and Sprint 2 (admin shell).

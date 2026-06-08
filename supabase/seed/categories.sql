@@ -1,0 +1,1 @@
+-- Reference seed for service categories (see 009_seed_data.sql)

@@ -1,0 +1,1 @@
+-- Invite codes are created by admin in Sprint 2 settings flow.
