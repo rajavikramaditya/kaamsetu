@@ -141,6 +141,7 @@ Additional rules:
 - **Validation** — Zod or equivalent at API boundaries; match PRD field rules.
 - **Activity log** — write audit entries for admin actions (approvals, dispatch, status changes).
 - **Job state machine** — follow PRD states; never skip states or allow invalid transitions.
+- **Category pricing** — seed from `docs/LAUNCH-CONFIG.md`; include `standard_visit_charge` on `service_categories`. Admin Settings (Sprint 4) must allow founder to edit visit charge and pricing mode without code changes.
 
 ---
 

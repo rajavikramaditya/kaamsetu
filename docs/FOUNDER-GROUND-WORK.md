@@ -39,21 +39,14 @@ Ye sabse important decision hai. Socho, likho, final karo.
 PRD ke hisaab se MVP mein maximum 5 categories. Inme se choose karo:
 
 ```
-[x] Category 1: __________Plumber_       (pricing: fixed / quote / daily wage)
-[x] Category 2: __________ Electrician_  (pricing: fixed / quote / daily wage)
-[x] Category 3: _____Helper Labour       (pricing: fixed / quote / daily wage)
-[x] Category 4: ___________    _panter   (pricing: fixed / quote / daily wage)
-[x] Category 5: __ firze/Ac Electrician  (pricing: fixed / quote / daily wage)
+[x] Category 1: Plumber          → quote_required · visit charge ₹99
+[x] Category 2: Electrician      → quote_required · visit charge ₹99
+[x] Category 3: Helper Labour    → daily_wage · half-day / full-day · visit ₹0
+[x] Category 4: Painter          → quote_required · visit charge ₹99
+[x] Category 5: Fridge / AC      → quote_required · visit charge ₹99
 ```
 
-**Tip:** Shuruat mein wahi categories lo jahan aapke paas pehle se 3-4 trusted workers hon.
-
-**Example categories:**
-- Electrician (fixed price)
-- Plumber (fixed price)
-- AC repair (quote required)
-- Helper / mazdoor (daily wage)
-- Carpenter (quote required)
+**Pricing baad mein edit hogi** — Sprint 4 admin Settings se `standard_visit_charge` change kar sakoge.
 
 ---
 
@@ -62,15 +55,19 @@ PRD ke hisaab se MVP mein maximum 5 categories. Inme se choose karo:
 App mein customer locality dropdown ke liye ye chahiye.
 
 ```
-[ ] Locality 1: _______________________
-[ ] Locality 2: _______________________
-[ ] Locality 3: _______________________
-[ ] Locality 4: _______________________
-[ ] Locality 5: _______________________
-[ ] (jitni chahiye utni likho, 5-15 theek hai shuruat ke liye)
+[x] Locality 1: Indira Nagar
+[x] Locality 2: Rath Road
+[x] Locality 3: Rajendra Nagar
+[x] Locality 4: Civil Lines
+[x] Locality 5: Patel Nagar
+[x] Locality 6: Tulsi Nagar
+[x] Locality 7: Sardar Patel Nagar
+[x] Locality 8: Konch Bus Stand Area
+[x] Locality 9: Station Road Area
+[x] Locality 10: Kalpi Road Area
 ```
 
-Ye list baad mein agent ko doge seed data ke liye.
+Full list synced in `docs/LAUNCH-CONFIG.md`.
 
 ---
 
@@ -448,39 +445,39 @@ Ye har din karna padega. Checklist bana lo:
 
 ---
 
-# PHASE 6 — Pricing Decide Karo (Ek Baar, Phir Adjust)
+# PHASE 6 — Pricing Decide Karo (Ek Baar, Phir Admin Se Edit)
 
-Agent app mein templates daalega. Aap prices decide karo.
+Beta values locked. **Baad mein admin panel → Settings → Categories** se edit kar sakte ho.
 
-## Fixed Price Jobs (Example — Apni City Ke Hisaab Se Badlo)
-
-```
-[ ] Switch repair: ₹_____
-[ ] Fan install: ₹_____
-[ ] Tap repair: ₹_____
-[ ] Basic electrical visit: ₹_____
-[ ] (aur jo categories choose ki hain)
-```
-
-## Quote Jobs
+## Standard visit charge (quote categories)
 
 ```
-[ ] Site visit fee: ₹49-99 (final bill mein adjust hoga)
-[ ] Commission: 8% labour pe (customer ko mat dikhao, andar se)
+[x] Plumber:        ₹99
+[x] Electrician:    ₹99
+[x] Painter:        ₹99
+[x] Fridge/AC:      ₹99
+[x] Helper Labour:  ₹0  (daily wage — half-day / full-day alag se)
+```
+
+## Quote jobs
+
+```
+[x] Site visit fee = standard_visit_charge (upar wali table)
+[x] Final quote founder manually enter karega admin panel se
 ```
 
 ## Daily Wage / Helper
 
 ```
-[ ] Half day rate: ₹_____
-[ ] Full day rate: ₹_____
-[ ] Platform service fee: 5% (hirer se, worker ka rate clean rakho)
+[ ] Half day rate: ₹_____  (admin settings se set karo Sprint 4 ke baad)
+[ ] Full day rate: ₹_____  (admin settings se set karo Sprint 4 ke baad)
+[ ] Platform service fee: 5% (hirer se — baad mein configure)
 ```
 
 ## Customer Assurance Fee
 
 ```
-[ ] Har completed job pe: ₹19-29 (support + trust ke liye)
+[ ] Har completed job pe: ₹19-29 (support + trust — Sprint 4 settings)
 ```
 
 **Tip:** Local market se pucho pehle. Urban Company / local rates dekho. Bahut zyada mat rakho shuruat mein.
@@ -509,12 +506,12 @@ Jab agent pooche, ye ready rakho:
 |---|---|
 | Launch city name | `[x]` Orai District, Jalaun UP |
 | Launch cluster | `[x]` Indra Nagar |
-| 5 categories + pricing mode | `[x]` Plumber, Electrician, Helper, Painter, Fridge/AC |
-| Localities list | `[ ] pending — Step 0.3` |
+| 5 categories + pricing mode | `[x]` + visit charges — LAUNCH-CONFIG |
+| Localities list | `[x]` 10 areas — see LAUNCH-CONFIG |
 | Supabase URL + keys | `[x]` ready |
 | Vercel deployed URL | `[x]` kaamsetu-green.vercel.app |
 | WhatsApp business number | `[ ] pending` |
-| Price templates | `[ ] pending` |
+| Price templates | `[x]` beta visit charges (admin editable later) |
 | Privacy policy text | `[ ] pending` |
 
 ---

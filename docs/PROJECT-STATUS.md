@@ -12,7 +12,8 @@
 |---|---|
 | City | Orai District, Jalaun, UP |
 | Cluster | Indra Nagar |
-| Categories | Plumber, Electrician, Helper/Labour, Painter, Fridge/AC Electrician |
+| Categories | 5 locked — quote/daily_wage + visit charges |
+| Localities | 10 areas (Indira Nagar → Kalpi Road) |
 | Config doc | `docs/LAUNCH-CONFIG.md` |
 
 > **Maintenance rule for AI agents:** After every successful sprint checkpoint or major deliverable, update this file — progress %, checkpoint status, blockers, and `Last updated`. Then **commit and push** per `AGENTS.md` §8.1 using the KS checkpoint ID (e.g. `KS-S0-foundation`). Do not mark a checkpoint ✅ until acceptance criteria from KS-009 are met and verified.
@@ -246,9 +247,9 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Blocker | Owner | Resolution |
 |---|---|---|
-| Localities list empty (Step 0.3) | Founder | Add 5–10 colony names in FOUNDER-GROUND-WORK |
 | WhatsApp Business not setup | Founder | Phase 2.1 in FOUNDER-GROUND-WORK |
 | Workers not recruited | Founder | Phase 3 — target 20 |
+| Helper half/full day rates | Founder | Set in admin Settings after Sprint 4 |
 
 ---
 
@@ -277,7 +278,7 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Date | Checkpoint | Change |
 |---|---|---|
-| 2026-06-16 | Founder config | Orai/Jalaun UP, Indra Nagar, 5 categories → `LAUNCH-CONFIG.md` |
+| 2026-06-16 | Founder config | Localities (10), pricing modes, `standard_visit_charge` beta values |
 | 2026-06-16 | `KS-S0-foundation` (`b873301`) | Pushed: Supabase client, health API, landing, docs |
 
 ---

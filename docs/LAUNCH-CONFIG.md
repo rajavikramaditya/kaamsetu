@@ -1,10 +1,10 @@
 # KaamSetu — Launch Configuration
 
-**Source:** Founder inputs from `docs/FOUNDER-GROUND-WORK.md`  
-**Last updated:** 2026-06-16  
-**Used by:** Sprint 1 seed data (`supabase/migrations/009_seed_data.sql`)
+**Source:** Founder inputs (confirmed 2026-06-16)  
+**Used by:** Sprint 1 seed (`supabase/migrations/009_seed_data.sql`)  
+**Editable later:** Admin → Settings → Categories (Sprint 4) — `pricing_type_default`, `standard_visit_charge`
 
-> Agent: use this file as canonical launch market config. If founder updates FOUNDER-GROUND-WORK, sync here before seed migrations.
+> Agent: this file is canonical for seed data. Schema must include `standard_visit_charge` on `service_categories` (see § Schema note below).
 
 ---
 
@@ -13,60 +13,87 @@
 | Field | Value |
 |---|---|
 | **District** | Orai, Jalaun, Uttar Pradesh |
-| **Launch cluster** | Indra Nagar (~3–5 km radius) |
-| **Rationale** | Founder on-ground, workers available, local demand |
+| **Launch cluster** | Indra Nagar + surrounding (~3–5 km) |
 | **Live app URL** | https://kaamsetu-green.vercel.app |
 | **Supabase project** | `hdpilxkplygjxvjytvxu` |
 
 ---
 
-## Service categories (max 5 — locked)
+## Service categories (5 — locked)
 
-| # | Category | Slug (seed) | Pricing mode | Notes |
-|---|---|---|---|---|
-| 1 | Plumber | `plumber` | `fixed_price` | Small repairs, tap, pipe |
-| 2 | Electrician | `electrician` | `fixed_price` | Switch, fan, wiring basics |
-| 3 | Helper / Labour | `helper-labour` | `daily_wage` | Half-day / full-day shifts |
-| 4 | Painter | `painter` | `quote_required` | Variable scope jobs |
-| 5 | Fridge / AC Electrician | `appliance-electrician` | `quote_required` | Fridge, AC repair & service |
+| # | Name | Slug | `pricing_type_default` | `standard_visit_charge` (₹) | Shift fields | Notes |
+|---|---|---|---|---:|---|---|
+| 1 | Plumber | `plumber` | `quote_required` | 99 | false | Visit fee before quote |
+| 2 | Electrician | `electrician` | `quote_required` | 99 | false | Visit fee before quote |
+| 3 | Helper / Labour | `helper_labour` | `daily_wage` | 0 | **true** | Half-day / full-day rates separate |
+| 4 | Painter | `painter` | `quote_required` | 99 | false | Variable scope |
+| 5 | Fridge / AC | `ac_appliance_repair` | `quote_required` | 99 | false | Appliance repair & service |
 
-**Pricing modes inferred from PRD defaults** — founder to confirm or correct before Sprint 1 seed deploy.
+### Helper / Labour — shift pricing (Sprint 4 admin editable)
 
----
+| Shift | Field (future) | Initial beta |
+|---|---|---|
+| Half day | `half_day_rate` | Founder sets in admin later |
+| Full day | `full_day_rate` | Founder sets in admin later |
 
-## Localities (customer dropdown)
-
-**Status:** ⏸ Pending — Step 0.3 not filled in FOUNDER-GROUND-WORK
-
-Minimum needed for Sprint 1 seed: **5–10 colony/area names** within Indra Nagar cluster.
-
-```
-[ ] Founder to add — e.g. Indra Nagar Block A, Indra Nagar Block B, nearby colonies
-```
-
-Until localities are listed, Sprint 1 seed will use **Indra Nagar** only as single locality placeholder.
+Helper has **no visit charge** (`standard_visit_charge = 0`).
 
 ---
 
-## Founder ops checklist status
+## Localities (10 — locked)
+
+All seeded with `city = 'Orai'`, `state = 'Uttar Pradesh'`, `is_serviceable = true`.
+
+| # | Name | Slug (seed) |
+|---|---|---|
+| 1 | Indira Nagar | `indira-nagar` |
+| 2 | Rath Road | `rath-road` |
+| 3 | Rajendra Nagar | `rajendra-nagar` |
+| 4 | Civil Lines | `civil-lines` |
+| 5 | Patel Nagar | `patel-nagar` |
+| 6 | Tulsi Nagar | `tulsi-nagar` |
+| 7 | Sardar Patel Nagar | `sardar-patel-nagar` |
+| 8 | Konch Bus Stand Area | `konch-bus-stand-area` |
+| 9 | Station Road Area | `station-road-area` |
+| 10 | Kalpi Road Area | `kalpi-road-area` |
+
+---
+
+## Schema note (Sprint 1)
+
+KS-006 `service_categories` needs one added column:
+
+```sql
+standard_visit_charge integer NOT NULL DEFAULT 0
+  CHECK (standard_visit_charge >= 0 AND standard_visit_charge <= 9999)
+```
+
+**Admin edit (Sprint 4):** Settings screen must allow founder to update per category:
+
+- `standard_visit_charge`
+- `pricing_type_default`
+- `is_active`
+- `name_en` / `name_hi`
+
+Changes apply to **new jobs only**; existing jobs keep `price_snapshot` at creation time.
+
+---
+
+## Founder ops checklist
 
 | Item | Status |
 |---|---|
-| Launch city locked | ✅ Orai, Jalaun UP |
-| Launch cluster | ✅ Indra Nagar |
-| 5 categories | ✅ Locked (pricing modes inferred) |
-| Localities list | ⏸ Pending |
-| Supabase + keys | ✅ Done |
-| Vercel deploy | ✅ kaamsetu-green.vercel.app |
-| WhatsApp Business | ⬜ Not started |
-| Price templates | ⬜ Not started |
-| Privacy policy | ⬜ Not started |
+| Launch city + cluster | ✅ |
+| 5 categories + pricing | ✅ Confirmed |
+| `standard_visit_charge` values | ✅ Beta values locked |
+| Localities (10) | ✅ |
+| Supabase + Vercel | ✅ |
+| WhatsApp Business | ⬜ |
+| Privacy policy | ⬜ |
 | Workers recruited | ⬜ 0 / 20 |
 
 ---
 
-## Next agent action
+## Seed SQL reference (Sprint 1)
 
-**Sprint 1 (`KS-S1-database-rls`)** — run KS-012 migrations + seed using this config.
-
-**Founder action before seed:** Fill Step 0.3 localities in `FOUNDER-GROUND-WORK.md` (5–10 names).
+Agent: generate `009_seed_data.sql` from this table data exactly.
