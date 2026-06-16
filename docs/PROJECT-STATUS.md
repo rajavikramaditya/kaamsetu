@@ -65,7 +65,7 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 | 0.9 | Supabase connected | 🟡 | Health API; secret key pending |
 
 **Sprint 0 exit criteria:** App runs locally · deployed on Vercel · Supabase connected  
-**Sprint 0 status:** 🟡 In progress (~75%)
+**Sprint 0 status:** 🟡 In progress (~85%) — code pushed; Vercel redeploy pending
 
 ---
 
@@ -238,7 +238,7 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 | Blocker | Owner | Resolution |
 |---|---|---|
 | Secret key not in `.env.local` | Founder | Supabase → API → Secret key → `SUPABASE_SERVICE_ROLE_KEY` |
-| Latest code not on GitHub | Agent/Founder | Commit + push Sprint 0 → Vercel auto-redeploys |
+| Latest code not on GitHub | — | Resolved — `b873301` pushed |
 | Env vars on Vercel | Founder | Settings → Environment Variables — confirm 3 keys added |
 | Launch city not locked | Founder | Pick city + cluster + 5 categories |
 
@@ -268,8 +268,8 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Date | Checkpoint | Change |
 |---|---|---|
-| 2026-06-16 | Sprint 0 | Supabase wired: env, client libs, health API, KS-011 folders, KaamSetu landing |
-| 2026-06-16 | Baseline | Initial status doc created. Planning docs complete. |
+| 2026-06-16 | `KS-S0-foundation` (`b873301`) | Pushed: Supabase client, health API, landing, docs, git checkpoint protocol |
+| 2026-06-16 | Sprint 0 | Supabase wired locally; Vercel live at kaamsetu-green.vercel.app |
 
 ---
 
