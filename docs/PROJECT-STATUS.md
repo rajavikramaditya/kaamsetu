@@ -3,8 +3,8 @@
 **Tagline:** Local Work. Trusted People.  
 **Last updated:** 2026-06-16  
 **Updated by:** AI Agent (founder launch config synced)  
-**Current phase:** Sprint 0 complete → Sprint 1 ready  
-**Overall progress:** ~15%
+**Current phase:** Sprint 1 — migrations ready, Supabase apply pending  
+**Overall progress:** ~22%
 
 ## Launch market (founder locked)
 
@@ -83,14 +83,15 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | # | Deliverable | Status | Verified |
 |---|---|---|---|
-| 1.1 | KS-006 schema migrations | ⬜ | — |
-| 1.2 | Enums, tables, indexes | ⬜ | — |
-| 1.3 | Storage buckets | ⬜ | — |
-| 1.4 | KS-007 RLS policies | ⬜ | — |
-| 1.5 | RLS tested (admin/worker/public) | ⬜ | — |
+| 1.1 | KS-006 schema migrations | ✅ | 11 SQL files in repo |
+| 1.2 | Enums, tables, indexes | ✅ | In migration pack |
+| 1.3 | Storage buckets | ✅ | 007_storage_buckets.sql |
+| 1.4 | KS-007 RLS policies | ✅ | 011_rls_policies.sql |
+| 1.5 | RLS tested (admin/worker/public) | ⬜ | After Supabase apply |
+| 1.6 | Migrations applied on Supabase | ⬜ | Founder: SQL Editor or db:migrate |
 
 **Sprint 1 exit criteria:** Schema deployed · RLS tested · Storage working  
-**Sprint 1 status:** ⬜ Not started
+**Sprint 1 status:** 🟡 In progress (~70%) — apply migrations on Supabase
 
 ---
 
@@ -247,7 +248,7 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Blocker | Owner | Resolution |
 |---|---|---|
-| WhatsApp Business not setup | Founder | Phase 2.1 in FOUNDER-GROUND-WORK |
+| Migrations not applied on Supabase | Founder | Run 11 SQL files — `supabase/README.md` |
 | Workers not recruited | Founder | Phase 3 — target 20 |
 | Helper half/full day rates | Founder | Set in admin Settings after Sprint 4 |
 
@@ -278,7 +279,7 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Date | Checkpoint | Change |
 |---|---|---|
-| 2026-06-16 | Founder config | Localities (10), pricing modes, `standard_visit_charge` beta values |
+| 2026-06-16 | `KS-S1-database-rls` (pending apply) | Migration pack + RLS + bootstrap API |
 | 2026-06-16 | `KS-S0-foundation` (`b873301`) | Pushed: Supabase client, health API, landing, docs |
 
 ---

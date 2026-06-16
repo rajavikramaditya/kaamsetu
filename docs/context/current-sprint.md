@@ -2,30 +2,25 @@
 
 **Checkpoint ID:** `KS-S1-database-rls`  
 **Goal:** KS-012 migrations + KS-007 RLS on Supabase  
-**Previous:** ✅ `KS-S0-foundation` complete
+**Status:** 🟡 Migration files ready — **founder must run on Supabase**
 
-## Launch config (from founder)
+## Done
 
-- **City:** Orai District, Jalaun, UP  
-- **Categories + visit charges:** `docs/LAUNCH-CONFIG.md`  
-- **Localities:** 10 locked  
-- **Schema add:** `service_categories.standard_visit_charge` (admin-editable Sprint 4)
+- [x] 11 migration SQL files (`supabase/migrations/`)
+- [x] `standard_visit_charge` on `service_categories`
+- [x] Seed: 5 categories + 10 Orai localities (LAUNCH-CONFIG)
+- [x] RLS policies (011_rls_policies.sql)
+- [x] `GET /api/public/bootstrap`
+- [x] `npm run db:migrate` script + `supabase/README.md`
+- [x] `npm run build` passes
 
-## Sprint 1 scope
+## Founder action required
 
-- [ ] KS-012 migration files in `supabase/migrations/`
-- [ ] Add `standard_visit_charge` column to `service_categories`
-- [ ] Enums, tables, indexes
-- [ ] Storage buckets
-- [ ] RLS policies (KS-007)
-- [ ] Seed from LAUNCH-CONFIG (5 categories + 10 localities)
+Run migrations on Supabase (see `supabase/README.md` Option A — SQL Editor, 11 files in order).
+
+Then verify: https://kaamsetu-green.vercel.app/api/public/bootstrap
+
+## Next after migrations applied
+
 - [ ] RLS smoke test
-
-## Founder blockers
-
-1. Helper half-day / full-day rates — optional until Sprint 4 admin Settings
-
-## Do not start yet
-
-- Worker screens (Sprint 2)
-- Customer flow (Sprint 3)
+- [ ] Sprint 2 — Worker module
