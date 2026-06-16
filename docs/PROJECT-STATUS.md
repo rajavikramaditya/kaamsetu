@@ -102,13 +102,13 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | # | Deliverable | Status | Verified |
 |---|---|---|---|
-| 2.1 | Worker login (Supabase Phone OTP) | ✅ | `/worker/login` |
+| 2.1 | Worker login (Email OTP; Phone OTP when SMS configured) | ✅ | `/worker/login` |
 | 2.2 | Profile + identity collection | ✅ | `/worker/profile` |
 | 2.3 | Document upload (Aadhaar required, PAN optional) | ✅ | `worker-documents` bucket |
 | 2.4 | Worker dashboard + availability toggle | ✅ | `/worker/dashboard` |
 
 **Sprint 2 exit criteria:** Worker can login · complete profile · upload documents · toggle availability when approved  
-**Sprint 2 status:** ✅ Implementation complete — apply migration `012_worker_sprint2.sql` + enable Phone OTP in Supabase Auth
+**Sprint 2 status:** ✅ Complete — Email OTP login live; enable Email provider in Supabase Auth
 
 ---
 

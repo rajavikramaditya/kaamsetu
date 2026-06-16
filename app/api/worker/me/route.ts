@@ -27,14 +27,10 @@ export async function GET() {
       return apiError("UNAUTHORIZED", "Login required", 401);
     }
 
-    const phone = await getAuthUserPhone(supabase);
-    if (!phone) {
-      return apiError("UNAUTHORIZED", "Valid phone session required", 401);
-    }
-
     let profile = await getWorkerProfileByAuthId(supabase, user.id);
     if (!profile) {
-      profile = await ensureWorkerProfile(supabase, user.id, phone);
+      const authPhone = await getAuthUserPhone(supabase);
+      profile = await ensureWorkerProfile(supabase, user.id, authPhone);
     }
 
     const documents = await getWorkerDocuments(supabase, profile.id);

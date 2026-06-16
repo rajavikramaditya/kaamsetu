@@ -6,10 +6,20 @@ export const phoneSchema = z
   .refine((v) => v.length === 10 || (v.length === 12 && v.startsWith("91")), {
     message: "Phone must be a valid 10-digit Indian mobile number",
   })
-  .transform((v) => (v.length === 12 ? v.slice(2) : v));
+  .transform((v) => (v.length === 12 ? v.slice(2) : v))
+  .refine((v) => !v.startsWith("000"), {
+    message: "Enter a valid mobile number",
+  });
+
+export const emailSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .email({ message: "Enter a valid email address" });
 
 export const workerProfileUpdateSchema = z.object({
   full_name: z.string().trim().min(2).max(80),
+  phone: phoneSchema,
   whatsapp_number: phoneSchema,
   primary_category_id: z.string().uuid(),
   locality_id: z.string().uuid(),

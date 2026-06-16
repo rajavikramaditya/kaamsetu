@@ -1,6 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { generateWorkerCode, normalizeIndianPhone } from "@/types/worker";
+import {
+  generateWorkerCode,
+  normalizeIndianPhone,
+  pendingPhonePlaceholder,
+} from "@/types/worker";
 import type { WorkerDocumentRow, WorkerProfileRow } from "@/types/worker";
 
 export async function getAuthUserPhone(
@@ -34,10 +38,12 @@ export async function getWorkerProfileByAuthId(
 export async function ensureWorkerProfile(
   supabase: SupabaseClient,
   authUserId: string,
-  phone: string,
+  authPhone?: string | null,
 ): Promise<WorkerProfileRow> {
   const existing = await getWorkerProfileByAuthId(supabase, authUserId);
   if (existing) return existing;
+
+  const phone = authPhone ?? pendingPhonePlaceholder(authUserId);
 
   const { data, error } = await supabase
     .from("worker_profiles")

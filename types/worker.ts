@@ -95,10 +95,25 @@ export function approvalStatusLabel(status: WorkerApprovalStatus): string {
   }
 }
 
+/** Placeholder until worker enters phone on profile (email OTP login). */
+export function pendingPhonePlaceholder(authUserId: string): string {
+  let hash = 0;
+  for (let i = 0; i < authUserId.length; i++) {
+    hash = (hash * 31 + authUserId.charCodeAt(i)) >>> 0;
+  }
+  return `000${String(hash).padStart(7, "0").slice(-7)}`;
+}
+
+export function isPendingProfilePhone(phone: string): boolean {
+  return phone.startsWith("000");
+}
+
 export function isProfileComplete(profile: WorkerProfileRow): boolean {
   return Boolean(
     profile.full_name?.trim() &&
       profile.full_name !== "Pending Worker" &&
+      profile.phone &&
+      !isPendingProfilePhone(profile.phone) &&
       profile.primary_category_id &&
       profile.locality_id &&
       profile.whatsapp_number,

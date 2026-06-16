@@ -1,26 +1,18 @@
 # Current Sprint — Sprint 2 (Worker Module)
 
 **Checkpoint ID:** `KS-S2-worker-module`  
-**Status:** 🟡 Implementation complete — run migration 012 on Supabase
+**Status:** ✅ Complete
 
-## Sprint 2 scope (delivered)
+## Worker login strategy (locked)
 
-- Phone OTP login (Supabase Auth)
-- Worker profile onboarding
-- Aadhaar upload (required) + PAN (optional)
-- Approval status flow (`pending` → founder approves → `approved`)
-- Availability toggle (Available / Busy) for approved workers
-- Worker Freedom Principle preserved (home locality display-only)
-
-## Not in Sprint 2 (by design)
-
-- Dispatch, offers, jobs, payments, notifications, automated KYC
+- **Email OTP** — permanent low-cost login for closed beta
+- **Phone OTP** — code path ready; enabled when SMS provider is configured (no Twilio/MessageBird now)
+- **Profile phone** — mandatory on worker profile (identity tied to phone + Aadhaar)
+- UI wording: *"Login with Email OTP now. Phone OTP will be enabled later when SMS provider is configured."*
 
 ## Founder action
 
-Run `supabase/migrations/012_worker_sprint2.sql` on Supabase (after 001–011).
-
-Enable **Phone** provider in Supabase Auth + SMS provider (Twilio/etc.) for production OTP.
+Enable **Email** provider in Supabase Auth (OTP emails are included).
 
 ## Next
 

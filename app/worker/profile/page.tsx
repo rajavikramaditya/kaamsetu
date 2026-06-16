@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { isPendingProfilePhone } from "@/types/worker";
 import { WorkerShell } from "@/components/worker/WorkerShell";
 
 type BootstrapData = {
@@ -14,6 +15,7 @@ type MeResponse = {
   success: boolean;
   profile?: {
     full_name: string;
+    phone: string;
     whatsapp_number: string | null;
     primary_category_id: string | null;
     locality_id: string | null;
@@ -30,6 +32,7 @@ export default function WorkerProfilePage() {
   const [bootstrap, setBootstrap] = useState<BootstrapData | null>(null);
   const [form, setForm] = useState({
     full_name: "",
+    phone: "",
     whatsapp_number: "",
     primary_category_id: "",
     locality_id: "",
@@ -59,6 +62,7 @@ export default function WorkerProfilePage() {
         if (me.profile) {
           setForm({
             full_name: me.profile.full_name === "Pending Worker" ? "" : me.profile.full_name,
+            phone: isPendingProfilePhone(me.profile.phone) ? "" : me.profile.phone,
             whatsapp_number: me.profile.whatsapp_number ?? "",
             primary_category_id: me.profile.primary_category_id ?? "",
             locality_id: me.profile.locality_id ?? "",
@@ -129,8 +133,9 @@ export default function WorkerProfilePage() {
         </p>
       )}
       <p className="text-sm text-stone-600">
-        Complete your profile for Orai. Home locality is for your records only — you can
-        accept jobs anywhere in the city.
+        Complete your profile for Orai. Your mobile number and Aadhaar are used for
+        identity verification. Home locality is for your records only — you can accept
+        jobs anywhere in the city.
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -140,6 +145,20 @@ export default function WorkerProfilePage() {
             required
             value={form.full_name}
             onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+            className="rounded-xl border border-stone-300 bg-white px-4 py-3"
+          />
+        </label>
+
+        <label className="flex flex-col gap-1 text-sm">
+          <span className="font-medium">Mobile number *</span>
+          <input
+            required
+            type="tel"
+            inputMode="numeric"
+            maxLength={10}
+            value={form.phone}
+            onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            placeholder="10-digit mobile"
             className="rounded-xl border border-stone-300 bg-white px-4 py-3"
           />
         </label>

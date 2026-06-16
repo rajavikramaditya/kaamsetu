@@ -24,14 +24,14 @@ Customer request (PWA, no login) → Admin triage & dispatch → Worker accept/d
 | Role | Auth | Access |
 |---|---|---|
 | **Customer** | None (invite code + track token) | Submit request, track job, rate |
-| **Worker** | Supabase Auth (phone UI + password, no SMS OTP) | Profile, KYC, offers, job updates |
+| **Worker** | Supabase Auth (Email OTP now; Phone OTP when SMS configured) | Profile, KYC, offers, job updates |
 | **Admin** | Supabase Auth (`role=admin`) | Full platform control |
 
 ### Critical product rules (never violate)
 
 1. **Serial dispatch only** — one active dispatch offer per job at any time.
 2. **No customer login** in MVP.
-3. **No SMS OTP** — password auth only (Supabase built-in).
+3. **Worker auth** — Email OTP for closed beta (low cost). Phone OTP code path kept for when SMS provider is configured. Worker identity = profile phone + Aadhaar.
 4. **One booking engine** — PWA and assisted (WhatsApp/phone) bookings share the same `jobs` table; differ only by `source_channel`.
 5. **Three pricing modes, one job model** — `fixed_price`, `quote_required`, `daily_wage` via `pricing_mode` field; never three separate booking systems.
 6. **Founder-controlled** — no auto-pricing, no parallel bidding, no AI matching.
@@ -45,7 +45,7 @@ Customer request (PWA, no login) → Admin triage & dispatch → Worker accept/d
 Do **not** add these unless explicitly requested and documented in a post-MVP phase:
 
 - Native apps · Wallet · Escrow · In-app chat · Maps · Live tracking
-- SMS OTP · Push notifications · WhatsApp API automation · IVR
+- SMS OTP (paid SMS provider) · Push notifications · WhatsApp API automation · IVR
 - Ads · Referrals · Coupons · Subscriptions · Auto-pricing · AI matching
 - Public worker discovery · Parallel multi-worker bidding
 - Razorpay API integration (manual payment links only, later)
@@ -128,7 +128,7 @@ Additional rules:
 - All tables defined in KS-006; apply via KS-012 migration pack.
 - Every table must have RLS policies from KS-007 before production data.
 - Storage buckets: worker documents and job media only (per PRD).
-- Auth: email/password or phone-as-identifier with password — **no phone OTP provider**.
+- Auth: Email OTP for workers (closed beta). Phone OTP when SMS provider configured. Admin email/password.
 - Admin role stored in user metadata or `profiles.role` — verify server-side.
 
 ---
@@ -226,7 +226,7 @@ Optional body: bullet list of deliverables verified.
 |---|---|
 | Building marketplace discovery UI | Founder dispatches; customer never picks workers |
 | Restricting dispatch by worker locality | Locality is display-only; filter by category + availability |
-| Adding SMS OTP | Password auth via Supabase; phone is UI identifier |
+| Adding paid SMS OTP before provider setup | Email OTP for workers now; Phone OTP when SMS configured |
 | Multiple active offers per job | Serial dispatch — one offer at a time |
 | Separate WhatsApp booking system | Same `jobs` table, `source_channel = assisted` |
 | Three booking flows for pricing modes | One job model with `pricing_mode` enum |

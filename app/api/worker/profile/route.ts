@@ -3,7 +3,6 @@ import { apiError, apiSuccess } from "@/lib/api/response";
 import { workerProfileUpdateSchema } from "@/lib/validation/worker";
 import {
   assertWorkerCanEdit,
-  getAuthUserPhone,
   getWorkerDocuments,
   getWorkerProfileByAuthId,
 } from "@/server/worker/profile";
@@ -30,9 +29,6 @@ export async function PUT(request: Request) {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return apiError("UNAUTHORIZED", "Login required", 401);
-
-    const phone = await getAuthUserPhone(supabase);
-    if (!phone) return apiError("UNAUTHORIZED", "Valid phone session required", 401);
 
     let profile = await getWorkerProfileByAuthId(supabase, user.id);
     if (!profile) {
@@ -75,7 +71,7 @@ export async function PUT(request: Request) {
         primary_category_id: fields.primary_category_id,
         locality_id: fields.locality_id,
         years_experience: fields.years_experience,
-        phone,
+        phone: fields.phone,
         approval_status,
       })
       .eq("id", profile.id)

@@ -6,9 +6,11 @@
 ## Phase 1 — Architecture Review
 
 ### Auth
-- Supabase Auth **Phone OTP** (client-side `signInWithOtp` / `verifyOtp`)
+- Supabase Auth **Email OTP** (primary — closed beta, low cost)
+- **Phone OTP** code path retained (`PhoneOtpLogin` component) for when SMS provider is configured
 - Session cookies via `@supabase/ssr` middleware on `/worker/*` and `/api/worker/*`
 - Worker profile auto-created on first `GET /api/worker/me` after OTP
+- Worker identity: **profile phone + Aadhaar** (even when login is via email)
 
 ### Data flow
 ```
@@ -52,7 +54,7 @@ Public (existing): `GET /api/public/bootstrap` — categories + localities for p
 
 | Route | Purpose |
 |---|---|
-| `/worker/login` | Phone OTP send/verify |
+| `/worker/login` | Email OTP (active) + Phone OTP (future) |
 | `/worker/profile` | Onboarding form + Aadhaar/PAN upload + submit |
 | `/worker/dashboard` | Status, availability toggle (approved), logout |
 
