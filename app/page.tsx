@@ -32,9 +32,12 @@ export default function Home() {
           <span className="inline-flex h-12 items-center justify-center rounded-full bg-teal-700 px-6 text-sm font-medium text-white opacity-60">
             Start Request — Coming Soon
           </span>
-          <span className="inline-flex h-12 items-center justify-center rounded-full border border-stone-300 px-6 text-sm font-medium text-stone-700 opacity-60">
-            Track Job — Coming Soon
-          </span>
+          <Link
+            href="/worker/login"
+            className="inline-flex h-12 items-center justify-center rounded-full border border-teal-700 px-6 text-sm font-medium text-teal-800"
+          >
+            Worker Login
+          </Link>
         </div>
 
         <div className="rounded-2xl border border-stone-200 bg-white p-6 text-sm text-stone-600">

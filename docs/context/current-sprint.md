@@ -1,23 +1,27 @@
-# Current Sprint — Sprint 1 (Database & Security)
+# Current Sprint — Sprint 2 (Worker Module)
 
-**Checkpoint ID:** `KS-S1-database-rls`  
-**Status:** ✅ Complete — database live, bootstrap verified
+**Checkpoint ID:** `KS-S2-worker-module`  
+**Status:** 🟡 Implementation complete — run migration 012 on Supabase
 
-## Sprint 1 decision (locked)
+## Sprint 2 scope (delivered)
 
-**Locality is display-only for MVP dispatch.** Future worker/admin offers must show job locality before accept/decline, but must **not** block cross-locality dispatch.
+- Phone OTP login (Supabase Auth)
+- Worker profile onboarding
+- Aadhaar upload (required) + PAN (optional)
+- Approval status flow (`pending` → founder approves → `approved`)
+- Availability toggle (Available / Busy) for approved workers
+- Worker Freedom Principle preserved (home locality display-only)
 
-Orai = one practical service radius (~10 km). Worker registered in Indira Nagar may receive and accept a job in Civil Lines.
+## Not in Sprint 2 (by design)
 
-## Done
+- Dispatch, offers, jobs, payments, notifications, automated KYC
 
-- [x] 11 migration SQL files applied on Supabase
-- [x] `standard_visit_charge` on `service_categories`
-- [x] Seed: 5 categories + 10 Orai localities
-- [x] RLS policies (011_rls_policies.sql)
-- [x] `GET /api/public/bootstrap` verified (5 categories, 10 localities)
-- [x] Locality rule doc correction (informational metadata only)
+## Founder action
+
+Run `supabase/migrations/012_worker_sprint2.sql` on Supabase (after 001–011).
+
+Enable **Phone** provider in Supabase Auth + SMS provider (Twilio/etc.) for production OTP.
 
 ## Next
 
-**Sprint 2 (`KS-S2-worker-module`)** — Worker login, profile, KYC, dashboard
+Sprint 3 — Customer request flow

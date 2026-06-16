@@ -3,8 +3,8 @@
 **Tagline:** Local Work. Trusted People.  
 **Last updated:** 2026-06-16  
 **Updated by:** AI Agent (founder launch config synced)  
-**Current phase:** Sprint 1 complete → Sprint 2 ready  
-**Overall progress:** ~25%
+**Current phase:** Sprint 2 complete → Sprint 3 ready  
+**Overall progress:** ~40%
 
 **Founder decision (locked):** Orai is treated as one service radius. Workers may accept jobs anywhere in Orai. Locality is used for address clarity, admin filtering, and analytics only — **not** dispatch restriction.
 
@@ -102,13 +102,13 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | # | Deliverable | Status | Verified |
 |---|---|---|---|
-| 2.1 | Worker login (phone + password auth) | ⬜ | — |
-| 2.2 | Profile + KYC screens | ⬜ | — |
-| 2.3 | Document upload | ⬜ | — |
-| 2.4 | Worker dashboard | ⬜ | — |
+| 2.1 | Worker login (Supabase Phone OTP) | ✅ | `/worker/login` |
+| 2.2 | Profile + identity collection | ✅ | `/worker/profile` |
+| 2.3 | Document upload (Aadhaar required, PAN optional) | ✅ | `worker-documents` bucket |
+| 2.4 | Worker dashboard + availability toggle | ✅ | `/worker/dashboard` |
 
-**Sprint 2 exit criteria:** Worker can login · complete profile · upload documents  
-**Sprint 2 status:** ⬜ Not started
+**Sprint 2 exit criteria:** Worker can login · complete profile · upload documents · toggle availability when approved  
+**Sprint 2 status:** ✅ Implementation complete — apply migration `012_worker_sprint2.sql` + enable Phone OTP in Supabase Auth
 
 ---
 
@@ -292,4 +292,4 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 **For founder:** Phase 3 — recruit workers. WhatsApp Business setup.
 
-**For agent:** Sprint 2 (`KS-S2-worker-module`) — worker login, profile, KYC.
+**For agent:** Sprint 3 (`KS-S3-customer-flow`) — customer request form, invite gate, track job.
