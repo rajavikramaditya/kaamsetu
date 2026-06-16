@@ -976,15 +976,15 @@ Immutable audit trail for all important actions.
 |---|---|---|---|
 | idx_customer_phone | customer_profiles | phone | Lookup/upsert |
 | idx_worker_phone | worker_profiles | phone | Login/admin search |
-| idx_worker_locality | worker_profiles | locality_id | Dispatch filtering |
-| idx_worker_category | worker_profiles | primary_category_id | Dispatch filtering |
+| idx_worker_locality | worker_profiles | locality_id | Admin filter / analytics (not dispatch eligibility) |
+| idx_worker_category | worker_profiles | primary_category_id | Dispatch shortlist by category |
 | idx_worker_approval | worker_profiles | approval_status | Admin approval queue |
 | idx_jobs_ref | jobs | job_ref | Public lookup |
 | idx_jobs_public_id | jobs | public_id | Public route lookup |
 | idx_jobs_customer | jobs | customer_profile_id | Customer history |
 | idx_jobs_worker | jobs | assigned_worker_id | Worker jobs |
 | idx_jobs_status | jobs | booking_status, dispatch_status, payment_status | Admin queues |
-| idx_jobs_locality | jobs | locality_id | Microzone filtering |
+| idx_jobs_locality | jobs | locality_id | Admin queue filter / analytics |
 | idx_dispatch_job | dispatch_attempts | job_id | Dispatch history |
 | idx_dispatch_worker | dispatch_attempts | worker_profile_id | Worker offers |
 | idx_payment_job | payments | job_id | Payment lookup |

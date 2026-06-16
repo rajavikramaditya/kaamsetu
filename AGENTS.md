@@ -36,6 +36,7 @@ Customer request (PWA, no login) → Admin triage & dispatch → Worker accept/d
 5. **Three pricing modes, one job model** — `fixed_price`, `quote_required`, `daily_wage` via `pricing_mode` field; never three separate booking systems.
 6. **Founder-controlled** — no auto-pricing, no parallel bidding, no AI matching.
 7. **PWA-first** — no native Android/iOS apps before closed beta.
+8. **Worker Freedom Principle** — In MVP, worker dispatch must **not** be restricted by locality. Locality is informational metadata only. Dispatch eligibility is based on **category, approval status, availability, and manual founder decision**. Workers may accept jobs anywhere in Orai; job locality must be **visible** on the offer card before accept/decline.
 
 ---
 
@@ -224,6 +225,7 @@ Optional body: bullet list of deliverables verified.
 | Mistake | Correct approach |
 |---|---|
 | Building marketplace discovery UI | Founder dispatches; customer never picks workers |
+| Restricting dispatch by worker locality | Locality is display-only; filter by category + availability |
 | Adding SMS OTP | Password auth via Supabase; phone is UI identifier |
 | Multiple active offers per job | Serial dispatch — one offer at a time |
 | Separate WhatsApp booking system | Same `jobs` table, `source_channel = assisted` |

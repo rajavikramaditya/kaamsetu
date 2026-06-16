@@ -126,7 +126,9 @@ The exact flow should be:
 
 **Dispatch flow.** Dispatch should be semi-manual in v1, not instant and algorithmic.
 
-The right logic is: create a shortlist by `category + locality + availability + trust flag`, then allow the founder to dispatch to **no more than three workers in a round**. That avoids double-accept conflicts, reduces ghost assignments, and keeps quality control tight. If nobody accepts within the founder’s chosen response window, the request moves to the next round or is marked `no_worker_found`.
+The right logic is: create a shortlist by `category + availability + trust flag` (locality is **not** a dispatch filter — Orai is one service radius), then allow the founder to dispatch to **no more than three workers in a round**. That avoids double-accept conflicts, reduces ghost assignments, and keeps quality control tight. If nobody accepts within the founder’s chosen response window, the request moves to the next round or is marked `no_worker_found`.
+
+Worker-facing dispatch must show **job locality, address/landmark summary, category, visit charge, and pricing mode** before accept/decline.
 
 Worker-facing dispatch should be simple: the worker sees the offer, taps accept or decline, and nothing else. There should be no worker bidding, no chat thread, no quote countering, and no worker-visible competing offers.
 
@@ -153,7 +155,7 @@ Worker-facing dispatch should be simple: the worker sees the offer, taps accept 
 | `invite_codes` | Closed-beta access control |
 | `activity_logs` | State changes, audit trail, admin actions |
 
-**Table design notes.** Keep `jobs` as the center of gravity. Important fields on `jobs` should include: `source_channel`, `pricing_mode`, `category_id`, `locality_id`, `address_text`, `customer_access_token`, `status`, `assigned_worker_id`, `quoted_amount`, `final_amount`, `payment_status`, `scheduled_at`, `started_at`, and `completed_at`. The worker profile should carry `coverage_locality_ids`, `service_category_ids`, `verification_status`, `badge_status`, `availability_status`, and cached trust fields.
+**Table design notes.** Keep `jobs` as the center of gravity. Important fields on `jobs` should include: `source_channel`, `pricing_mode`, `category_id`, `locality_id`, `address_text`, `customer_access_token`, `status`, `assigned_worker_id`, `quoted_amount`, `final_amount`, `payment_status`, `scheduled_at`, `started_at`, and `completed_at`. The worker profile should carry `locality_id` (home/display only — **not** dispatch territory), `service_category_ids`, `verification_status`, `badge_status`, `availability_status`, and cached trust fields. Do **not** add `coverage_locality_ids` or territory tables in MVP.
 
 **Database tables not required.** These should stay out of scope entirely:
 
@@ -299,12 +301,13 @@ This means KaamSetu v1 trust is built from **identity, locality, and behavior**,
 
 Internally, dispatch ordering should use a simple rules-based score:
 - availability match
-- locality match
 - category match
 - complaint flag
 - response rate
 - completion rate
 - repeat customer count
+
+Locality is **not** a dispatch score factor in MVP (informational/display only).
 
 Do not expose the full internal score. Do not build an AI ranking engine. Do not show workers a competitive leaderboard. The MVP goal is trust and reliability, not gamification.
 
@@ -414,7 +417,7 @@ That puts the realistic early-build envelope around **₹4,000–₹7,000**, sti
 
 **Step one.** Build the data model and the admin shell first. The first usable milestone is not a beautiful app; it is an admin console that can create a worker, create a job, assign a job, change a job state, and record a payment.
 
-**Step two.** Build worker onboarding and worker login. Without supply, there is no marketplace. Worker availability, locality coverage, service categories, and verification status must exist before customer demand is invited.
+**Step two.** Build worker onboarding and worker login. Without supply, there is no marketplace. Worker availability, home locality (display), service categories, and verification status must exist before customer demand is invited.
 
 **Step three.** Build the customer request form and tracking page. Keep it simple, guest-first, and token-based. This is where you prevent demand-side overengineering.
 

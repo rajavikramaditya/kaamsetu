@@ -417,7 +417,7 @@ Ye har din karna padega. Checklist bana lo:
 ```
 [ ] Request padho — category, locality, urgency samjho
 [ ] Pricing decide karo (fixed template ya manual quote)
-[ ] Suitable worker shortlist karo (category + locality + available)
+[ ] Suitable worker shortlist karo (category + availability + trust/responsiveness; show customer locality to worker before accept/decline)
 [ ] Dispatch offer bhejo — EK worker ko EK offer (serial rule)
 [ ] Worker ne accept nahi kiya? → next worker ko bhejo
 [ ] Worker assign ho gaya? → customer ko WhatsApp/call se batao

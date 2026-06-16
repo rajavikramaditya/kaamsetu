@@ -13,9 +13,23 @@
 | Field | Value |
 |---|---|
 | **District** | Orai, Jalaun, Uttar Pradesh |
-| **Launch cluster** | Indra Nagar + surrounding (~3–5 km) |
+| **Launch cluster** | Orai city (~10 km practical radius — one service area) |
 | **Live app URL** | https://kaamsetu-green.vercel.app |
 | **Supabase project** | `hdpilxkplygjxvjytvxu` |
+
+---
+
+## Locality rule (locked — Sprint 1)
+
+```text
+Locality = metadata / display
+NOT dispatch restriction
+```
+
+- **Customer/job locality:** address clarity, admin filters, analytics
+- **Worker home locality:** profile display only — does not limit job eligibility
+- **Dispatch shortlist:** category + approval + availability (+ founder judgment)
+- **Worker offer card must show:** category, job locality, address/landmark, visit charge, pricing mode, accept/decline
 
 ---
 

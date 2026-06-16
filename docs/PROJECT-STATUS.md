@@ -3,8 +3,10 @@
 **Tagline:** Local Work. Trusted People.  
 **Last updated:** 2026-06-16  
 **Updated by:** AI Agent (founder launch config synced)  
-**Current phase:** Sprint 1 — migrations ready, Supabase apply pending  
-**Overall progress:** ~22%
+**Current phase:** Sprint 1 complete → Sprint 2 ready  
+**Overall progress:** ~25%
+
+**Founder decision (locked):** Orai is treated as one service radius. Workers may accept jobs anywhere in Orai. Locality is used for address clarity, admin filtering, and analytics only — **not** dispatch restriction.
 
 ## Launch market (founder locked)
 
@@ -50,7 +52,8 @@ Your **immediate MVP goal** (PRD + Scope Lock) is narrower and correct:
 | Vercel deployment | ✅ Done | https://kaamsetu-green.vercel.app |
 | PWA manifest | 🟡 Partial | Skeleton in `app/manifest.ts` — icons later |
 | Domain / branding | ⬜ Not started | — |
-| Tests | ⬜ Not started | — |
+| Database + seed | ✅ Done | Live on Supabase; bootstrap OK |
+| Dispatch locality rule | ✅ Locked | Informational only — see AGENTS.md §1 |
 
 **Stray file to clean:** `text. Text` (from test PR on GitHub — not part of KaamSetu)
 
@@ -87,11 +90,11 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 | 1.2 | Enums, tables, indexes | ✅ | In migration pack |
 | 1.3 | Storage buckets | ✅ | 007_storage_buckets.sql |
 | 1.4 | KS-007 RLS policies | ✅ | 011_rls_policies.sql |
-| 1.5 | RLS tested (admin/worker/public) | ⬜ | After Supabase apply |
-| 1.6 | Migrations applied on Supabase | ⬜ | Founder: SQL Editor or db:migrate |
+| 1.5 | RLS tested (admin/worker/public) | ✅ | Founder verified |
+| 1.6 | Migrations applied on Supabase | ✅ | Bootstrap API OK |
 
 **Sprint 1 exit criteria:** Schema deployed · RLS tested · Storage working  
-**Sprint 1 status:** 🟡 In progress (~70%) — apply migrations on Supabase
+**Sprint 1 status:** ✅ Complete (`KS-S1-database-rls`)
 
 ---
 
@@ -248,7 +251,7 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Blocker | Owner | Resolution |
 |---|---|---|
-| Migrations not applied on Supabase | Founder | Run 11 SQL files — `supabase/README.md` |
+| WhatsApp Business not setup | Founder | Phase 2.1 in FOUNDER-GROUND-WORK |
 | Workers not recruited | Founder | Phase 3 — target 20 |
 | Helper half/full day rates | Founder | Set in admin Settings after Sprint 4 |
 
@@ -279,13 +282,14 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Date | Checkpoint | Change |
 |---|---|---|
-| 2026-06-16 | `KS-S1-database-rls` (pending apply) | Migration pack + RLS + bootstrap API |
+| 2026-06-16 | Locality rule | Orai = one radius; locality display-only, not dispatch filter |
+| 2026-06-16 | `KS-S1-database-rls` | Migrations live; bootstrap verified |
 | 2026-06-16 | `KS-S0-foundation` (`b873301`) | Pushed: Supabase client, health API, landing, docs |
 
 ---
 
 ## 9. Next Recommended Action
 
-**For founder:** Step 0.3 — localities list bharo (5–10 colonies). Phase 3 — workers dhundhna shuru.
+**For founder:** Phase 3 — recruit workers. WhatsApp Business setup.
 
-**For agent:** Sprint 1 (`KS-S1-database-rls`) — database migrations + seed from `LAUNCH-CONFIG.md`.
+**For agent:** Sprint 2 (`KS-S2-worker-module`) — worker login, profile, KYC.
