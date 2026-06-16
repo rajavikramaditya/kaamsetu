@@ -9,7 +9,7 @@ export async function GET() {
     const [categoriesRes, localitiesRes] = await Promise.all([
       supabase
         .from("service_categories")
-        .select("slug, name_en, name_hi, pricing_type_default, standard_visit_charge, requires_shift_fields, sort_order")
+        .select("id, slug, name_en, name_hi, pricing_type_default, standard_visit_charge, requires_shift_fields, sort_order")
         .eq("is_active", true)
         .order("sort_order"),
       supabase

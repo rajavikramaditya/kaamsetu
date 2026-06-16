@@ -58,7 +58,10 @@ export default function WorkerProfilePage() {
           router.push("/worker/login");
           return;
         }
-        setBootstrap(boot);
+        setBootstrap({
+          service_categories: boot.service_categories ?? [],
+          localities: boot.localities ?? [],
+        });
         if (me.profile) {
           setForm({
             full_name: me.profile.full_name === "Pending Worker" ? "" : me.profile.full_name,
@@ -106,7 +109,16 @@ export default function WorkerProfilePage() {
         }),
       });
       const data = await res.json();
-      if (!data.success) throw new Error(data.error?.message ?? "Save failed");
+      if (!data.success) {
+        const details = data.error?.details?.issues;
+        const fieldErrors = details?.fieldErrors as Record<string, string[]> | undefined;
+        if (fieldErrors) {
+          const messages = Object.entries(fieldErrors)
+            .flatMap(([field, msgs]) => msgs.map((m) => `${field}: ${m}`));
+          if (messages.length > 0) throw new Error(messages.join(". "));
+        }
+        throw new Error(data.error?.message ?? "Save failed");
+      }
       setStatus(data.profile.approval_status_label);
       router.push("/worker/dashboard");
       router.refresh();
