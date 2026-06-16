@@ -153,6 +153,7 @@ Additional rules:
 3. Map every change to a KS document — if it isn't in the PRD, don't build it.
 4. After completing a checkpoint → follow **§8.1 Git Checkpoint Protocol** (mandatory).
 5. If architecture conflict found → stop, note in PROJECT-STATUS, do not hack around it.
+6. Live/manual test results must be recorded in `docs/PROJECT-STATUS.md`. If a live test passes, record what passed. If a live test fails, record the exact blocker and do not mark the sprint closed.
 
 ### Sprint order (do not skip)
 
@@ -164,13 +165,15 @@ Sprint 0: Foundation → Sprint 1: DB + RLS → Sprint 2: Worker
 
 ### 8.1 Git Checkpoint Protocol (mandatory)
 
-After every **validated** sprint checkpoint, the agent **must** commit and push to `origin/main` without waiting for the founder to ask.
+After every **validated** sprint checkpoint, bug fix, doc correction, auth repair, migration repair, UI fix, or live-test repair, the agent **must** commit and push to `origin/main` without waiting for the founder to ask.
+
+After every validated correction or successful fix, the agent must commit and push to origin/main. This includes bug fixes, doc corrections, auth fixes, migration fixes, UI fixes, and live-test repairs. Push is required because Vercel deploys from GitHub.
 
 **When to commit**
 
 - All acceptance criteria for the checkpoint are met (see KS-009 + `docs/PROJECT-STATUS.md`).
 - `npm run build` passes (or equivalent verification for that checkpoint).
-- `docs/PROJECT-STATUS.md` updated (status, changelog, blockers).
+- `docs/PROJECT-STATUS.md` updated (status, changelog, blockers, live/manual test results).
 - `docs/context/current-sprint.md` updated if sprint scope changed.
 
 **When NOT to commit**
@@ -178,7 +181,7 @@ After every **validated** sprint checkpoint, the agent **must** commit and push 
 - Checkpoint incomplete or unverified.
 - Build or lint fails and is not fixed.
 - Files contain secrets (`.env.local`, API keys, passwords).
-- Only founder-side ops steps done (no code changes) — update PROJECT-STATUS only.
+- Only founder-side ops steps done with no repository changes — do not commit. If repository status docs are updated, commit and push those doc updates.
 
 **Checkpoint naming (KS-009 aligned)**
 
@@ -216,7 +219,7 @@ Optional body: bullet list of deliverables verified.
 
 **Branch rule:** Push directly to `main` unless founder requests a feature branch.
 
-**Do not ask "should I push?"** after a validated checkpoint — push is part of the protocol.
+**Do not ask "should I push?"** after a validated checkpoint or successful fix — push is part of the protocol.
 
 ---
 
