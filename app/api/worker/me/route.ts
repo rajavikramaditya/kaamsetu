@@ -6,6 +6,7 @@ import {
   getAuthUserPhone,
   getWorkerDocuments,
   getWorkerProfileByAuthId,
+  getWorkerProfileLabels,
 } from "@/server/worker/profile";
 import { hasRequiredDocuments } from "@/server/worker/documents";
 import {
@@ -35,6 +36,7 @@ export async function GET() {
 
     const documents = await getWorkerDocuments(supabase, profile.id);
     const docs = hasRequiredDocuments(documents);
+    const labels = await getWorkerProfileLabels(supabase, profile);
 
     return apiSuccess({
       profile: {
@@ -44,7 +46,9 @@ export async function GET() {
         phone: profile.phone,
         whatsapp_number: profile.whatsapp_number,
         primary_category_id: profile.primary_category_id,
+        primary_category_name: labels.primary_category_name,
         locality_id: profile.locality_id,
+        locality_name: labels.locality_name,
         years_experience: profile.years_experience ?? 0,
         approval_status: profile.approval_status,
         approval_status_label: approvalStatusLabel(profile.approval_status),

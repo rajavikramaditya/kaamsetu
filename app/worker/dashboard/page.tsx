@@ -13,6 +13,8 @@ type MeResponse = {
     worker_code: string;
     full_name: string;
     phone: string;
+    primary_category_name: string | null;
+    locality_name: string | null;
     approval_status: string;
     approval_status_label: string;
     rejection_reason: string | null;
@@ -96,6 +98,16 @@ export default function WorkerDashboardPage() {
             <p className="text-sm text-stone-500">{profile.worker_code}</p>
             <p className="text-lg font-semibold text-stone-900">{profile.full_name}</p>
             <p className="text-sm text-stone-600">+91 {profile.phone}</p>
+            {profile.primary_category_name && (
+              <p className="mt-2 text-sm text-stone-600">
+                Category: <strong>{profile.primary_category_name}</strong>
+              </p>
+            )}
+            {profile.locality_name && (
+              <p className="text-sm text-stone-600">
+                Home locality: <strong>{profile.locality_name}</strong>
+              </p>
+            )}
           </div>
 
           <div className="rounded-2xl border border-stone-200 bg-white p-4">

@@ -77,6 +77,33 @@ export async function getWorkerDocuments(
   return (data ?? []) as WorkerDocumentRow[];
 }
 
+export async function getWorkerProfileLabels(
+  supabase: SupabaseClient,
+  profile: Pick<WorkerProfileRow, "primary_category_id" | "locality_id">,
+): Promise<{ primary_category_name: string | null; locality_name: string | null }> {
+  const [categoryRes, localityRes] = await Promise.all([
+    profile.primary_category_id
+      ? supabase
+          .from("service_categories")
+          .select("name_en")
+          .eq("id", profile.primary_category_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    profile.locality_id
+      ? supabase
+          .from("localities")
+          .select("name")
+          .eq("id", profile.locality_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+  ]);
+
+  return {
+    primary_category_name: categoryRes.data?.name_en ?? null,
+    locality_name: localityRes.data?.name ?? null,
+  };
+}
+
 export function assertWorkerCanEdit(profile: WorkerProfileRow) {
   if (profile.approval_status === "suspended") {
     throw new Error("ACCOUNT_SUSPENDED");
