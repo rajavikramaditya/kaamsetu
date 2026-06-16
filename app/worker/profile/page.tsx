@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import { isPendingProfilePhone } from "@/types/worker";
 import { WorkerShell } from "@/components/worker/WorkerShell";
@@ -23,9 +24,45 @@ type MeResponse = {
     approval_status: string;
     approval_status_label: string;
     rejection_reason: string | null;
+    profile_complete: boolean;
   };
   documents?: { aadhaar_uploaded: boolean; pan_uploaded: boolean };
 };
+
+async function saveProfile(
+  form: {
+    full_name: string;
+    phone: string;
+    whatsapp_number: string;
+    primary_category_id: string;
+    locality_id: string;
+    years_experience: string;
+  },
+  submitForReview: boolean,
+) {
+  const res = await fetch("/api/worker/profile", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      ...form,
+      years_experience: Number(form.years_experience),
+      submit_for_review: submitForReview,
+    }),
+  });
+  const data = await res.json();
+  if (!data.success) {
+    const details = data.error?.details?.issues;
+    const fieldErrors = details?.fieldErrors as Record<string, string[]> | undefined;
+    if (fieldErrors) {
+      const messages = Object.entries(fieldErrors).flatMap(([field, msgs]) =>
+        msgs.map((m) => `${field}: ${m}`),
+      );
+      if (messages.length > 0) throw new Error(messages.join(". "));
+    }
+    throw new Error(data.error?.message ?? "Save failed");
+  }
+  return data;
+}
 
 export default function WorkerProfilePage() {
   const router = useRouter();
@@ -40,6 +77,10 @@ export default function WorkerProfilePage() {
   });
   const [aadhaarFile, setAadhaarFile] = useState<File | null>(null);
   const [panFile, setPanFile] = useState<File | null>(null);
+  const [aadhaarUploaded, setAadhaarUploaded] = useState(false);
+  const [panUploaded, setPanUploaded] = useState(false);
+  const [approvalStatus, setApprovalStatus] = useState<string>("");
+  const [profileComplete, setProfileComplete] = useState(false);
   const [status, setStatus] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -71,8 +112,12 @@ export default function WorkerProfilePage() {
             locality_id: me.profile.locality_id ?? "",
             years_experience: String(me.profile.years_experience ?? 0),
           });
+          setApprovalStatus(me.profile.approval_status);
+          setProfileComplete(me.profile.profile_complete);
           setStatus(me.profile.approval_status_label);
         }
+        setAadhaarUploaded(Boolean(me.documents?.aadhaar_uploaded));
+        setPanUploaded(Boolean(me.documents?.pan_uploaded));
       } catch {
         setError("Failed to load profile");
       } finally {
@@ -96,30 +141,29 @@ export default function WorkerProfilePage() {
     setSaving(true);
     setError(null);
     try {
-      if (aadhaarFile) await uploadDocument(aadhaarFile, "aadhaar_image");
-      if (panFile) await uploadDocument(panFile, "pan_image");
+      const isApproved = approvalStatus === "approved";
 
-      const res = await fetch("/api/worker/profile", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          years_experience: Number(form.years_experience),
-          submit_for_review: true,
-        }),
-      });
-      const data = await res.json();
-      if (!data.success) {
-        const details = data.error?.details?.issues;
-        const fieldErrors = details?.fieldErrors as Record<string, string[]> | undefined;
-        if (fieldErrors) {
-          const messages = Object.entries(fieldErrors)
-            .flatMap(([field, msgs]) => msgs.map((m) => `${field}: ${m}`));
-          if (messages.length > 0) throw new Error(messages.join(". "));
-        }
-        throw new Error(data.error?.message ?? "Save failed");
+      await saveProfile(form, false);
+
+      if (aadhaarFile) {
+        await uploadDocument(aadhaarFile, "aadhaar_image");
+        setAadhaarUploaded(true);
       }
-      setStatus(data.profile.approval_status_label);
+      if (panFile) {
+        await uploadDocument(panFile, "pan_image");
+        setPanUploaded(true);
+      }
+
+      const hasAadhaar = aadhaarUploaded || Boolean(aadhaarFile);
+      if (!hasAadhaar) {
+        throw new Error("Aadhaar image is required before submission");
+      }
+
+      if (!isApproved) {
+        const data = await saveProfile(form, true);
+        setStatus(data.profile.approval_status_label);
+      }
+
       router.push("/worker/dashboard");
       router.refresh();
     } catch (err) {
@@ -131,19 +175,32 @@ export default function WorkerProfilePage() {
 
   if (loading) {
     return (
-      <WorkerShell title="Profile">
+      <WorkerShell title="Profile" active="profile">
         <p className="text-sm text-stone-600">Loading…</p>
       </WorkerShell>
     );
   }
 
+  const isApproved = approvalStatus === "approved";
+
   return (
-    <WorkerShell title="Worker Profile">
+    <WorkerShell title="Worker Profile" active="profile">
       {status && (
         <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900">
           Status: <strong>{status}</strong>
         </p>
       )}
+
+      {profileComplete && (
+        <p className="rounded-xl bg-teal-50 px-4 py-3 text-sm text-teal-900">
+          Availability (Available / Busy) is on the{" "}
+          <Link href="/worker/dashboard" className="font-medium underline">
+            Dashboard
+          </Link>
+          .
+        </p>
+      )}
+
       <p className="text-sm text-stone-600">
         Complete your profile for Orai. Your mobile number and Aadhaar are used for
         identity verification. Home locality is for your records only — you can accept
@@ -235,6 +292,9 @@ export default function WorkerProfilePage() {
 
         <label className="flex flex-col gap-1 text-sm">
           <span className="font-medium">Aadhaar image * (JPEG/PNG, max 5MB)</span>
+          {aadhaarUploaded && (
+            <span className="text-xs text-teal-700">Already uploaded — choose a file only to replace.</span>
+          )}
           <input
             type="file"
             accept="image/jpeg,image/png,image/webp"
@@ -245,6 +305,9 @@ export default function WorkerProfilePage() {
 
         <label className="flex flex-col gap-1 text-sm">
           <span className="font-medium">PAN image (optional)</span>
+          {panUploaded && (
+            <span className="text-xs text-teal-700">Already uploaded — choose a file only to replace.</span>
+          )}
           <input
             type="file"
             accept="image/jpeg,image/png,image/webp"
@@ -258,7 +321,11 @@ export default function WorkerProfilePage() {
           disabled={saving}
           className="rounded-full bg-teal-700 px-4 py-3 font-medium text-white disabled:opacity-60"
         >
-          {saving ? "Submitting…" : "Submit for Review"}
+          {saving
+            ? "Saving…"
+            : isApproved
+              ? "Save Profile"
+              : "Submit for Review"}
         </button>
       </form>
 

@@ -14,7 +14,25 @@ export async function uploadWorkerDocument(
       : file.type === "image/webp"
         ? "webp"
         : "jpg";
-  const storagePath = `${workerProfileId}/${documentType}-${Date.now()}.${ext}`;
+  const storagePath = `${workerProfileId}/${documentType}.${ext}`;
+
+  const { data: existing } = await admin
+    .from("worker_documents")
+    .select("id, storage_path")
+    .eq("worker_profile_id", workerProfileId)
+    .eq("document_type", documentType);
+
+  if (existing?.length) {
+    const paths = existing.map((row) => row.storage_path);
+    await admin.storage.from("worker-documents").remove(paths);
+    await admin
+      .from("worker_documents")
+      .delete()
+      .in(
+        "id",
+        existing.map((row) => row.id),
+      );
+  }
 
   const buffer = Buffer.from(await file.arrayBuffer());
   const { error: uploadError } = await admin.storage

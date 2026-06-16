@@ -82,7 +82,7 @@ export default function WorkerDashboardPage() {
 
   if (loading) {
     return (
-      <WorkerShell title="Dashboard">
+      <WorkerShell title="Dashboard" active="dashboard">
         <p className="text-sm text-stone-600">Loading…</p>
       </WorkerShell>
     );
@@ -91,7 +91,7 @@ export default function WorkerDashboardPage() {
   const profile = me?.profile;
 
   return (
-    <WorkerShell title="Dashboard">
+    <WorkerShell title="Dashboard" active="dashboard">
       {profile && (
         <>
           <div className="rounded-2xl border border-stone-200 bg-white p-4">
@@ -147,8 +147,9 @@ export default function WorkerDashboardPage() {
           )}
 
           <div className="rounded-2xl border border-dashed border-stone-300 bg-white p-4 text-sm text-stone-600">
-            Job offers and dispatch arrive in Sprint 5. Your profile is ready for founder
-            review.
+            {profile.approval_status === "approved"
+              ? "Job offers and dispatch arrive in Sprint 5. Use the availability toggle above when you are ready for work."
+              : "Job offers and dispatch arrive in Sprint 5. Your profile is ready for founder review."}
           </div>
 
           <div className="flex flex-col gap-2">

@@ -49,6 +49,13 @@ export async function PUT(request: Request) {
 
     let approval_status = profile.approval_status;
     if (submit_for_review) {
+      if (profile.approval_status === "approved") {
+        return apiError(
+          "FORBIDDEN",
+          "Approved workers cannot resubmit for review",
+          403,
+        );
+      }
       const documents = await getWorkerDocuments(supabase, profile.id);
       const docs = hasRequiredDocuments(documents);
       if (!docs.aadhaar) {
