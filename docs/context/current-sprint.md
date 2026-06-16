@@ -1,29 +1,31 @@
-# Current Sprint — Sprint 0 (Foundation)
+# Current Sprint — Sprint 1 (Database & Security)
 
-**Checkpoint ID:** `KS-S0-foundation`  
-**Goal:** Repo foundation + Supabase wired + deploy-ready scaffold  
-**Next:** Sprint 1 — KS-012 database migrations (`KS-S1-database-rls`)
+**Checkpoint ID:** `KS-S1-database-rls`  
+**Goal:** KS-012 migrations + KS-007 RLS on Supabase  
+**Previous:** ✅ `KS-S0-foundation` complete
 
-## In scope (Sprint 0)
+## Launch config (from founder)
 
-- [x] Next.js + TypeScript + App Router
-- [x] Folder structure (KS-011)
-- [x] `.env.example` + Supabase client libs
-- [x] Health API (`GET /api/health`)
-- [x] KaamSetu landing placeholder
-- [x] PWA manifest skeleton
-- [x] `npm run build` passes
-- [x] Vercel project linked (founder)
-- [x] Secret key in `.env.local` (founder)
-- [ ] Vercel live site shows KaamSetu (after git push redeploy)
-- [ ] Prettier (optional polish)
+- **City:** Orai District, Jalaun, UP  
+- **Cluster:** Indra Nagar  
+- **Categories:** Plumber, Electrician, Helper/Labour, Painter, Fridge/AC Electrician  
+- **See:** `docs/LAUNCH-CONFIG.md`
+
+## Sprint 1 scope
+
+- [ ] KS-012 migration files in `supabase/migrations/`
+- [ ] Enums, tables, indexes
+- [ ] Storage buckets
+- [ ] RLS policies (KS-007)
+- [ ] Seed data (categories + localities from LAUNCH-CONFIG)
+- [ ] RLS smoke test
 
 ## Founder blockers
 
-1. Confirm env vars on Vercel Settings → Environment Variables
-2. Lock launch city + 5 categories (see `FOUNDER-GROUND-WORK.md`)
+1. **Localities** — Step 0.3 in FOUNDER-GROUND-WORK (5–10 colony names)
+2. Confirm category pricing modes in LAUNCH-CONFIG if different
 
 ## Do not start yet
 
-- Database tables (Sprint 1)
-- Worker/customer/admin screens (Sprint 2+)
+- Worker screens (Sprint 2)
+- Customer flow (Sprint 3)

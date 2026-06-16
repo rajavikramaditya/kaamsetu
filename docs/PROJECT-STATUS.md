@@ -2,9 +2,18 @@
 
 **Tagline:** Local Work. Trusted People.  
 **Last updated:** 2026-06-16  
-**Updated by:** AI Agent (Sprint 0 — Supabase wired)  
-**Current phase:** Sprint 0 (Foundation) — nearly complete  
-**Overall progress:** ~12% (planning complete, foundation scaffold + Supabase client)
+**Updated by:** AI Agent (founder launch config synced)  
+**Current phase:** Sprint 0 complete → Sprint 1 ready  
+**Overall progress:** ~15%
+
+## Launch market (founder locked)
+
+| Field | Value |
+|---|---|
+| City | Orai District, Jalaun, UP |
+| Cluster | Indra Nagar |
+| Categories | Plumber, Electrician, Helper/Labour, Painter, Fridge/AC Electrician |
+| Config doc | `docs/LAUNCH-CONFIG.md` |
 
 > **Maintenance rule for AI agents:** After every successful sprint checkpoint or major deliverable, update this file — progress %, checkpoint status, blockers, and `Last updated`. Then **commit and push** per `AGENTS.md` §8.1 using the KS checkpoint ID (e.g. `KS-S0-foundation`). Do not mark a checkpoint ✅ until acceptance criteria from KS-009 are met and verified.
 
@@ -35,9 +44,9 @@ Your **immediate MVP goal** (PRD + Scope Lock) is narrower and correct:
 | Planning docs | ✅ Complete | PRD, schema, RLS, API, sprints, build pack in `docs/` |
 | Next.js scaffold | ✅ Done | KaamSetu landing + layout |
 | Folder structure (KS-011) | ✅ Done | `features/`, `server/`, `supabase/`, etc. |
-| Supabase project | 🟡 Partial | Project created; URL + publishable key in `.env.local` |
-| Supabase client libs | ✅ Done | Browser + server + admin clients |
-| Vercel deployment | 🟡 Partial | Live: `https://kaamsetu-green.vercel.app` — needs latest code push |
+| Supabase project | ✅ Done | Connected; health OK |
+| Supabase client libs | ✅ Done | Browser + server + admin |
+| Vercel deployment | ✅ Done | https://kaamsetu-green.vercel.app |
 | PWA manifest | 🟡 Partial | Skeleton in `app/manifest.ts` — icons later |
 | Domain / branding | ⬜ Not started | — |
 | Tests | ⬜ Not started | — |
@@ -57,15 +66,15 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 | 0.1 | Next.js + TypeScript + App Router | ✅ | KaamSetu landing |
 | 0.2 | Folder structure per KS-011 | ✅ | — |
 | 0.3 | Supabase project created | ✅ | `hdpilxkplygjxvjytvxu` |
-| 0.4 | Vercel project + deploy | 🟡 | Live URL: kaamsetu-green.vercel.app |
-| 0.5 | Environment variables (`.env.example`) | ✅ | `.env.local` configured locally |
+| 0.4 | Vercel project + deploy | ✅ | kaamsetu-green.vercel.app |
+| 0.5 | Environment variables (`.env.example`) | ✅ | Local + Vercel |
 | 0.6 | ESLint + Prettier configured | 🟡 | ESLint only |
 | 0.7 | App runs locally | ✅ | — |
-| 0.8 | App deployed on Vercel | 🟡 | Old code live — push Sprint 0 needed |
-| 0.9 | Supabase connected | 🟡 | Health API; secret key pending |
+| 0.8 | App deployed on Vercel | ✅ | KaamSetu landing live |
+| 0.9 | Supabase connected | ✅ | `/api/health` OK |
 
 **Sprint 0 exit criteria:** App runs locally · deployed on Vercel · Supabase connected  
-**Sprint 0 status:** 🟡 In progress (~85%) — code pushed; Vercel redeploy pending
+**Sprint 0 status:** ✅ Complete (`KS-S0-foundation`)
 
 ---
 
@@ -237,10 +246,9 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Blocker | Owner | Resolution |
 |---|---|---|
-| Secret key not in `.env.local` | Founder | Supabase → API → Secret key → `SUPABASE_SERVICE_ROLE_KEY` |
-| Latest code not on GitHub | — | Resolved — `b873301` pushed |
-| Env vars on Vercel | Founder | Settings → Environment Variables — confirm 3 keys added |
-| Launch city not locked | Founder | Pick city + cluster + 5 categories |
+| Localities list empty (Step 0.3) | Founder | Add 5–10 colony names in FOUNDER-GROUND-WORK |
+| WhatsApp Business not setup | Founder | Phase 2.1 in FOUNDER-GROUND-WORK |
+| Workers not recruited | Founder | Phase 3 — target 20 |
 
 ---
 
@@ -260,6 +268,7 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 | `KS-013-Build-Task-Pack-v1.0.md` | Task-level execution |
 | `AGENTS.md` | AI agent operating rules |
 | `FOUNDER-GROUND-WORK.md` | Founder step-by-step ground ops (Hinglish) |
+| `LAUNCH-CONFIG.md` | Locked launch city, categories, seed config |
 | **`PROJECT-STATUS.md`** | **This file — living status** |
 
 ---
@@ -268,13 +277,13 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Date | Checkpoint | Change |
 |---|---|---|
-| 2026-06-16 | `KS-S0-foundation` (`b873301`) | Pushed: Supabase client, health API, landing, docs, git checkpoint protocol |
-| 2026-06-16 | Sprint 0 | Supabase wired locally; Vercel live at kaamsetu-green.vercel.app |
+| 2026-06-16 | Founder config | Orai/Jalaun UP, Indra Nagar, 5 categories → `LAUNCH-CONFIG.md` |
+| 2026-06-16 | `KS-S0-foundation` (`b873301`) | Pushed: Supabase client, health API, landing, docs |
 
 ---
 
 ## 9. Next Recommended Action
 
-**For founder:** Add Secret key to `.env.local` · Vercel deploy · lock launch city.
+**For founder:** Step 0.3 — localities list bharo (5–10 colonies). Phase 3 — workers dhundhna shuru.
 
-**For agent:** Sprint 1 — KS-012 database migrations + RLS (after Sprint 0 Vercel deploy).
+**For agent:** Sprint 1 (`KS-S1-database-rls`) — database migrations + seed from `LAUNCH-CONFIG.md`.

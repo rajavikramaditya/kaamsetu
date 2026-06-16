@@ -507,14 +507,15 @@ Jab agent pooche, ye ready rakho:
 
 | Item | Status |
 |---|---|
-| Launch city name | `[ ] ready` |
-| 5 categories + pricing mode | `[ ] ready` |
-| Localities list | `[ ] ready` |
-| Supabase URL + keys | `[ ] ready` |
-| Vercel deployed URL | `[ ] ready` |
-| WhatsApp business number | `[ ] ready` |
-| Price templates | `[ ] ready` |
-| Privacy policy text | `[ ] ready` |
+| Launch city name | `[x]` Orai District, Jalaun UP |
+| Launch cluster | `[x]` Indra Nagar |
+| 5 categories + pricing mode | `[x]` Plumber, Electrician, Helper, Painter, Fridge/AC |
+| Localities list | `[ ] pending — Step 0.3` |
+| Supabase URL + keys | `[x]` ready |
+| Vercel deployed URL | `[x]` kaamsetu-green.vercel.app |
+| WhatsApp business number | `[ ] pending` |
+| Price templates | `[ ] pending` |
+| Privacy policy text | `[ ] pending` |
 
 ---
 
@@ -531,5 +532,5 @@ Jab agent pooche, ye ready rakho:
 
 ---
 
-**Last updated:** 2026-06-16  
-**Related files:** `docs/PROJECT-STATUS.md` · `AGENTS.md`
+**Last updated:** 2026-06-16 (founder: city + categories locked)  
+**Related files:** `docs/PROJECT-STATUS.md` · `docs/LAUNCH-CONFIG.md` · `AGENTS.md`
