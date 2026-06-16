@@ -9,6 +9,14 @@ import { createClient } from "@/lib/supabase/client";
 
 type LoginMethod = "email" | "phone";
 
+function formatAuthError(message: string): string {
+  const lower = message.toLowerCase();
+  if (lower.includes("rate limit")) {
+    return "Email limit reached — Supabase allows only a few OTP emails per hour on the free built-in mail service. Wait about 1 hour, or use the last email you already received (link or 6-digit code).";
+  }
+  return message;
+}
+
 export default function WorkerLoginPage() {
   const router = useRouter();
   const [method, setMethod] = useState<LoginMethod>("email");
@@ -39,14 +47,18 @@ export default function WorkerLoginPage() {
       const trimmed = email.trim().toLowerCase();
       if (!trimmed.includes("@")) throw new Error("Enter a valid email address");
       const supabase = createClient();
+      const redirectTo = `${window.location.origin}/auth/callback`;
       const { error: otpError } = await supabase.auth.signInWithOtp({
         email: trimmed,
-        options: { shouldCreateUser: true },
+        options: {
+          shouldCreateUser: true,
+          emailRedirectTo: redirectTo,
+        },
       });
       if (otpError) throw otpError;
       setStep("otp");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to send OTP");
+      setError(formatAuthError(err instanceof Error ? err.message : "Failed to send OTP"));
     } finally {
       setLoading(false);
     }
@@ -77,7 +89,8 @@ export default function WorkerLoginPage() {
     <WorkerShell title="Login">
       <p className="text-sm text-stone-600">
         Login with Email OTP now. Phone OTP will be enabled later when SMS provider is
-        configured.
+        configured. Check your email — click the sign-in link or enter the 6-digit code
+        below.
       </p>
 
       <div className="flex rounded-full border border-stone-200 bg-white p-1">
@@ -135,10 +148,25 @@ export default function WorkerLoginPage() {
             >
               {loading ? "Sending…" : "Send Email OTP"}
             </button>
+            {error?.includes("Email limit reached") && (
+              <button
+                type="button"
+                onClick={() => {
+                  setError(null);
+                  setStep("otp");
+                }}
+                className="rounded-full border border-teal-700 px-4 py-3 text-sm font-medium text-teal-800"
+              >
+                I already have the email — enter code / use link
+              </button>
+            )}
           </form>
         ) : (
           <form onSubmit={verifyEmailOtp} className="flex flex-col gap-4">
-            <p className="text-sm text-stone-600">OTP sent to {email.trim().toLowerCase()}</p>
+            <p className="text-sm text-stone-600">
+              Check {email.trim().toLowerCase()} — click the sign-in link in the email, or
+              enter the 6-digit code here.
+            </p>
             <label className="flex flex-col gap-1 text-sm">
               <span className="font-medium text-stone-800">Enter OTP</span>
               <input
