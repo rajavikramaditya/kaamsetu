@@ -6,9 +6,11 @@ type CustomerShellProps = {
   title: string;
   children: React.ReactNode;
   active?: "request" | "track";
+  /** When false, hides top-right nav links (e.g. track page). Defaults to true. */
+  showNav?: boolean;
 };
 
-export function CustomerShell({ title, children, active }: CustomerShellProps) {
+export function CustomerShell({ title, children, active, showNav = true }: CustomerShellProps) {
   return (
     <div className="mx-auto flex min-h-full w-full max-w-lg flex-col bg-stone-50">
       <header className="border-b border-teal-100 bg-white px-4 py-4">
@@ -19,28 +21,30 @@ export function CustomerShell({ title, children, active }: CustomerShellProps) {
             </p>
             <h1 className="text-lg font-semibold text-stone-900">{title}</h1>
           </div>
-          <nav className="flex shrink-0 flex-col items-end gap-1 text-sm">
-            <Link
-              href="/request"
-              className={
-                active === "request"
-                  ? "font-medium text-teal-800"
-                  : "text-teal-700 underline-offset-4 hover:underline"
-              }
-            >
-              New Request
-            </Link>
-            <Link
-              href="/track"
-              className={
-                active === "track"
-                  ? "font-medium text-teal-800"
-                  : "text-teal-700 underline-offset-4 hover:underline"
-              }
-            >
-              My Requests
-            </Link>
-          </nav>
+          {showNav && (
+            <nav className="flex shrink-0 flex-col items-end gap-1 text-sm">
+              <Link
+                href="/request"
+                className={
+                  active === "request"
+                    ? "font-medium text-teal-800"
+                    : "text-teal-700 underline-offset-4 hover:underline"
+                }
+              >
+                New Request
+              </Link>
+              <Link
+                href="/track"
+                className={
+                  active === "track"
+                    ? "font-medium text-teal-800"
+                    : "text-teal-700 underline-offset-4 hover:underline"
+                }
+              >
+                My Requests
+              </Link>
+            </nav>
+          )}
         </div>
       </header>
       <main className="flex flex-1 flex-col gap-4 p-4">{children}</main>

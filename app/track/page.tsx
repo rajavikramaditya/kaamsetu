@@ -287,7 +287,7 @@ export default function TrackJobPage() {
   const normalizedPhone = phoneLookup.replace(/\D/g, "").slice(-10);
 
   return (
-    <CustomerShell title={pageTitle} active="track">
+    <CustomerShell title={pageTitle} active="track" showNav={false}>
       {hasSavedRequests ? (
         <>
           <section className="flex flex-col gap-3">
