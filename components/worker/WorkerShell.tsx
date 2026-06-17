@@ -44,6 +44,9 @@ export function WorkerShell({ title, children, active }: WorkerShellProps) {
         </div>
       </header>
       <main className="flex flex-1 flex-col gap-4 p-4">{children}</main>
+      <footer className="border-t border-stone-100 px-4 py-2 text-center text-[10px] text-stone-400">
+        Build {process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "local"}
+      </footer>
     </div>
   );
 }

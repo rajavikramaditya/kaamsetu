@@ -1,6 +1,13 @@
 import Link from "next/link";
 
-export default function Home() {
+import { createClient } from "@/lib/supabase/server";
+
+export default async function Home() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <div className="flex flex-1 flex-col">
       <header className="border-b border-teal-100 bg-white">
@@ -32,12 +39,21 @@ export default function Home() {
           <span className="inline-flex h-12 items-center justify-center rounded-full bg-teal-700 px-6 text-sm font-medium text-white opacity-60">
             Start Request — Coming Soon
           </span>
-          <Link
-            href="/worker/login"
-            className="inline-flex h-12 items-center justify-center rounded-full border border-teal-700 px-6 text-sm font-medium text-teal-800"
-          >
-            Worker Login
-          </Link>
+          {user ? (
+            <Link
+              href="/worker/dashboard"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-teal-700 px-6 text-sm font-medium text-teal-800"
+            >
+              Worker Dashboard
+            </Link>
+          ) : (
+            <Link
+              href="/worker/login"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-teal-700 px-6 text-sm font-medium text-teal-800"
+            >
+              Worker Login
+            </Link>
+          )}
         </div>
 
         <div className="rounded-2xl border border-stone-200 bg-white p-6 text-sm text-stone-600">

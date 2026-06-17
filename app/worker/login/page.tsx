@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { PhoneOtpLogin } from "@/components/worker/PhoneOtpLogin";
@@ -25,6 +25,18 @@ export default function WorkerLoginPage() {
   const [step, setStep] = useState<"email" | "otp">("email");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch("/api/worker/me")
+      .then((res) => res.json())
+      .then((me) => {
+        if (!me.success) return;
+        router.replace(
+          me.profile?.profile_complete ? "/worker/dashboard" : "/worker/profile",
+        );
+      })
+      .catch(() => undefined);
+  }, [router]);
 
   async function afterAuthSuccess() {
     const meRes = await fetch("/api/worker/me");
