@@ -153,25 +153,66 @@ Response
 
 ```json
 {
-  "job_ref":"KS-000001",
-  "tracking_code":"XXXXXX"
+  "success": true,
+  "job_id": "uuid",
+  "public_id": "uuid",
+  "job_ref": "KS-000001",
+  "track_code": "123456",
+  "booking_status": "requested",
+  "next_step": "photo_upload"
 }
 ```
 
 ---
 
-## POST /api/public/track
+## POST /api/public/jobs/{publicId}/media
 
 Purpose:
-Track job.
+Upload customer issue media (photo or voice note).
+
+Request (`multipart/form-data`)
+
+| Field | Required | Notes |
+|---|---|---|
+| `file` | Yes | Single file per request |
+| `media_kind` | Yes | `issue_photo` or `issue_voice_note` |
+| `job_ref` | Yes | `KS-######` |
+| `phone` | Yes | 10-digit mobile |
+| `track_code` | Yes | 6 digits |
+
+Response
+
+```json
+{
+  "success": true,
+  "media_id": "uuid",
+  "media_kind": "issue_photo",
+  "uploaded_count": 1
+}
+```
+
+Rules:
+- Max **5** `issue_photo` rows per job.
+- Max **1** `issue_voice_note` row per job (client records max 60s).
+- Photos should be client-compressed before upload where possible (1280px max width, ~0.7 quality, WebP/JPEG).
+- Max 5 MB per file after compression.
+
+Errors: `PHOTO_LIMIT`, `VOICE_LIMIT`, `VALIDATION_ERROR`, `FORBIDDEN`
+
+---
+
+## POST /api/public/jobs/lookup
+
+Purpose:
+Track job (manual lookup or via device-saved request). Client stores `job_ref`, `phone`, `track_code`, `category`, `locality`, `created_at` in `localStorage` after request create; My Requests UI calls this endpoint with stored credentials.
 
 Request
 
 ```json
 {
-  "job_ref":"KS-000001",
-  "phone":"9999999999",
-  "tracking_code":"XXXXXX"
+  "job_ref": "KS-000001",
+  "phone": "9999999999",
+  "track_code": "123456"
 }
 ```
 
@@ -179,7 +220,46 @@ Response
 
 ```json
 {
-  "status":"assigned"
+  "success": true,
+  "job": {
+    "public_id": "uuid",
+    "job_ref": "KS-000001",
+    "booking_status": "requested",
+    "dispatch_status": "not_started",
+    "payment_status": "not_due",
+    "service_category": "Plumber",
+    "locality": "Indira Nagar",
+    "description": "...",
+    "address_text": "...",
+    "requested_at": "2026-06-17T00:00:00Z"
+  }
+}
+```
+
+Note: Legacy path `POST /api/public/track` is superseded by `/api/public/jobs/lookup`.
+
+---
+
+## POST /api/public/track (deprecated)
+
+Superseded by `POST /api/public/jobs/lookup`. Kept for reference only.
+
+Request
+
+```json
+{
+  "job_ref": "KS-000001",
+  "phone": "9999999999",
+  "track_code": "123456"
+}
+```
+
+Response
+
+```json
+{
+  "success": true,
+  "job": { "booking_status": "requested" }
 }
 ```
 

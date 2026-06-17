@@ -690,7 +690,7 @@ This is the most important table in KaamSetu v1.0.
 
 ## 9.9 job_media
 
-Stores metadata for job issue photos and completion evidence.
+Stores metadata for job issue photos, issue voice notes, and completion evidence.
 
 ### Columns
 
@@ -700,7 +700,7 @@ Stores metadata for job issue photos and completion evidence.
 | job_id | uuid | No | none | FK |
 | uploaded_by_role | text | No | none | customer/worker/admin |
 | uploaded_by_user_id | uuid | Yes | null | Auth user if available |
-| media_kind | text | No | issue_photo | issue_photo/completion_photo |
+| media_kind | text | No | issue_photo | issue_photo / issue_voice_note / completion_photo / other |
 | storage_path | text | No | none | Private bucket path |
 | mime_type | text | No | none | File type |
 | file_size_bytes | integer | No | none | Size |
@@ -708,9 +708,11 @@ Stores metadata for job issue photos and completion evidence.
 
 ### Constraints
 
-- Max 3 issue photos per job in application logic.
+- Max **5** issue photos per job in application logic.
+- Max **1** issue voice note per job in application logic (max 60s recorded client-side).
 - Max 5 MB per file.
-- Allowed image types only for public uploads.
+- Issue photos: image types only for public uploads; client-side compression preferred before upload.
+- Issue voice notes: audio types (`audio/webm`, `audio/ogg`, `audio/mp4`); no transcription in MVP.
 
 ### Relationships
 

@@ -46,7 +46,7 @@ KaamSetu exists to do five things and only five things in MVP:
 
 | User type | Authentication | Access |
 |---|---|---|
-| Anonymous beta customer | No account; invite code + job ref + track code | Submit request, upload photos, track job, confirm payment, rate, complain |
+| Anonymous beta customer | No account; invite code + job ref + track code + device saved request | Submit request, upload photos/voice note, track job (saved or manual lookup), confirm payment, rate, complain |
 | Worker | Supabase Auth session | Login, complete KYC/profile, view offers, accept/decline, update job status, view earnings |
 | Admin | Supabase Auth session with `role=admin` | Full founder control over approvals, requests, dispatch, jobs, payments, complaints, settings, logs |
 
@@ -54,8 +54,8 @@ KaamSetu exists to do five things and only five things in MVP:
 
 | Journey | End-to-end path |
 |---|---|
-| Customer booking | Landing Page → Invite Gate → New Request Form → Photo Upload → Request Submitted |
-| Customer follow-up | Request Submitted → Track Job → Payment Confirmation → Rating & Complaint |
+| Customer booking | Landing Page → Invite Gate → New Request Form → Photos & Voice → Request Submitted |
+| Customer follow-up | Request Submitted → My Requests (device saved) or Manual Track → Payment Confirmation → Rating & Complaint |
 | Worker onboarding | Admin creates worker → Worker Login → KYC/Profile → Admin approval → Worker Dashboard |
 | Job fulfillment | Request Queue → Triage → Dispatch Board → Worker accepts → Active Job → Status Update → Payment Ledger → Close |
 | Issue handling | Track Job or Job Details → Complaint created → Complaints queue → Admin resolution |
@@ -66,7 +66,7 @@ At any time, one job can have only one active dispatch offer. Dispatch is serial
 
 ## Customer PWA
 
-The customer PWA is an installable mobile web app with an invite-gated request flow and a token-lite tracking flow. PWA install metadata should be delivered through the Next.js manifest convention, but offline data sync is not required in MVP. citeturn1search5turn1search2
+The customer PWA is an **installable mobile web app** — treat it as an app experience, not a browser-only website. Camera and microphone permissions are acceptable when the user initiates photo or voice capture. PWA install metadata is delivered through the Next.js manifest convention; offline data sync is not required in MVP. Customer login is **not** in MVP; requests are tracked via invite + track token and **device-saved requests** (`localStorage`).
 
 **Landing Page**
 
@@ -110,19 +110,19 @@ The customer PWA is an installable mobile web app with an invite-gated request f
 | Error states | Invalid invite; duplicate request within cooldown; locality not serviceable; rate limit exceeded |
 | API calls | `GET /api/public/bootstrap`; `POST /api/public/requests` |
 
-**Photo Upload**
+**Photos & Voice (issue media)**
 
 | Item | Spec |
 |---|---|
-| Purpose | Attach optional issue photos to improve triage quality |
-| Entry conditions | Request already created; `job_ref` and `public_id` returned |
-| UI components | Photo picker, preview grid, remove action, skip button, continue button |
-| Form fields | Up to 3 files; no caption field in MVP |
-| Validation rules | Optional; max 3 files; `image/jpeg`, `image/png`, `image/webp`; max 5 MB each; reject HEIC unless browser converts client-side; no PDF |
-| User actions | Upload; remove; skip; continue |
-| Success states | All files stored and linked to `job_media`; move to Request Submitted |
-| Error states | Unsupported file type; too many files; upload timeout; partial upload failure |
-| API calls | `POST /api/public/jobs/{publicId}/media` |
+| Purpose | Attach optional issue photos and one voice note to improve triage quality |
+| Entry conditions | Request already created; `job_ref`, `public_id`, and credentials in session |
+| UI components | Multi photo picker, upload progress, optional voice recorder (record/stop/re-record), skip/continue |
+| Form fields | Up to 5 photos; one optional voice note (max 60 seconds) |
+| Validation rules | Photos: optional; max 5 per job; client-compressed before upload where possible (max width 1280px, ~0.7 quality, WebP/JPEG preferred; fallback to original if compression fails); `image/jpeg`, `image/png`, `image/webp`; max 5 MB each after compression. Voice: optional; max 1 per job; max 60s duration; `audio/webm`, `audio/ogg`, or `audio/mp4`; max 5 MB; microphone permission requested only when user taps Record. **Video upload deferred until after 100 jobs.** |
+| User actions | Select/upload photos; record/upload voice note; skip; continue to tracking |
+| Success states | Files stored and linked to `job_media` (`issue_photo`, `issue_voice_note`); move to Request Submitted or My Requests |
+| Error states | Unsupported file type; photo/voice limit reached; upload timeout; mic permission denied |
+| API calls | `POST /api/public/jobs/{publicId}/media` with `media_kind=issue_photo` or `issue_voice_note` |
 
 **Request Submitted**
 
@@ -130,26 +130,24 @@ The customer PWA is an installable mobile web app with an invite-gated request f
 |---|---|
 | Purpose | Confirm creation and hand the customer the information needed to track the job later |
 | Entry conditions | Request creation succeeded |
-| UI components | Success message, `job_ref`, `track_code`, request summary, “Track Job,” “Copy Details,” and “WhatsApp Help” buttons |
-| Form fields | None |
-| Validation rules | N/A |
-| User actions | Copy details; open tracking flow; open WhatsApp help |
-| Success states | Customer sees confirmation and next steps |
-| Error states | Lost session on refresh; if refreshed, customer must use Track Job lookup with `job_ref + phone + track_code` |
+| UI components | Success message, `job_ref`, `track_code` (backup), request summary, “My Requests,” “Add photos & voice,” device-save notice |
+| User actions | Open My Requests; add media; copy track code for other devices |
+| Success states | Customer sees confirmation; request saved to device `localStorage` on same phone/app |
+| Error states | Lost session on refresh on another device; use manual Track lookup with `job_ref + phone + track_code` or founder recovery for beta |
 | API calls | Uses `POST /api/public/requests` response; optional `POST /api/public/jobs/lookup` on refresh recovery |
 
-**Track Job**
+**Track Job / My Requests**
 
 | Item | Spec |
 |---|---|
 | Purpose | Let a customer retrieve current status without creating an account |
-| Entry conditions | Customer has `job_ref`, phone, and `track_code` |
-| UI components | Lookup form, status timeline, assigned worker summary, amount summary, action buttons for payment/rating/complaint depending on status |
-| Form fields | Lookup state: `job_ref`, `phone`, `track_code` |
-| Validation rules | `job_ref` required, format `KS-######`; `phone` 10-digit mobile; `track_code` 6 digits; 5 failed attempts per IP per hour max |
-| User actions | Lookup job; refresh; go to payment confirmation if payment due; go to rating/complaint if eligible |
-| Success states | Status timeline shown; limited worker details visible only after assignment |
-| Error states | Not found; wrong credentials; too many failed attempts; cancelled job |
+| Entry conditions | Same device: saved request in `localStorage`. Other device: `job_ref`, phone, and `track_code` |
+| UI components | **My Requests** list (device saved), manual lookup form (fallback), status card, action buttons for payment/rating/complaint when eligible |
+| Form fields | Saved path: tap saved card (credentials stored locally). Manual fallback: `job_ref`, `phone`, `track_code` |
+| Validation rules | `job_ref` format `KS-######`; `phone` 10-digit mobile; `track_code` 6 digits. Device warning: *“This request is saved on this device. If you use another phone, save your job reference and track code.”* |
+| User actions | Tap saved request; manual lookup; refresh status; go to payment/rating/complaint when eligible |
+| Success states | Status shown from saved card or manual lookup |
+| Error states | Not found; wrong credentials; saved request missing on new device (use manual fallback) |
 | API calls | `POST /api/public/jobs/lookup` |
 
 **Payment Confirmation**
@@ -390,7 +388,7 @@ All business data should live in Supabase Postgres, all uploads in private Supab
 | `service_categories` | Seeded list of service types supported in beta | `id uuid PK`; `slug text unique`; `name_en text`; `name_hi text`; `pricing_type_default text`; `requires_shift_fields boolean`; `is_active boolean`; `sort_order integer`; `created_at timestamptz`; `updated_at timestamptz` | `id`, `slug`, `name_en`, `pricing_type_default`, `is_active` | Referenced by jobs and worker primary category |
 | `localities` | Serviceable area list for a single city launch or adjacent areas | `id uuid PK`; `city text`; `state text`; `name text`; `pincode text null`; `is_serviceable boolean`; `is_active boolean`; `sort_order integer`; `created_at timestamptz`; `updated_at timestamptz` | `id`, `city`, `name`, `is_serviceable`, `is_active` | Referenced by customer profiles, worker profiles, jobs, invite codes |
 | `jobs` | Master operational table for every request | `id uuid PK`; `public_id text unique`; `tracking_code_hash text`; `customer_profile_id uuid`; `invite_code_id uuid null`; `service_category_id uuid`; `locality_id uuid`; `request_source text`; `pricing_type text`; `description text`; `address_text text`; `landmark text null`; `preferred_date date null`; `preferred_time_slot text`; `workers_needed integer null`; `shift_type text null`; `booking_status text`; `dispatch_status text`; `payment_status text`; `complaint_status text`; `assigned_worker_id uuid null`; `assigned_dispatch_attempt_id uuid null`; `estimated_amount numeric(10,2) null`; `final_amount numeric(10,2) null`; `worker_payable_amount numeric(10,2) null`; `customer_payment_preference text`; `admin_notes text null`; `status_reason text null`; `requested_at timestamptz`; `assigned_at timestamptz null`; `started_at timestamptz null`; `completed_at timestamptz null`; `closed_at timestamptz null`; `created_at timestamptz`; `updated_at timestamptz` | `id`, `public_id`, `tracking_code_hash`, `customer_profile_id`, `service_category_id`, `locality_id`, `request_source`, `pricing_type`, `description`, `address_text`, `preferred_time_slot`, `booking_status`, `dispatch_status`, `payment_status`, `complaint_status`, `customer_payment_preference`, `requested_at` | Belongs to customer, category, locality; optionally assigned to worker; one payment row, one rating row, one complaint row, many media rows, many dispatch attempts |
-| `job_media` | File metadata for issue photos and completion evidence | `id uuid PK`; `job_id uuid`; `uploaded_by_role text`; `uploaded_by_user_id uuid null`; `media_kind text`; `storage_path text`; `mime_type text`; `file_size_bytes integer`; `created_at timestamptz` | `id`, `job_id`, `uploaded_by_role`, `media_kind`, `storage_path`, `mime_type` | Many media rows per job; uploader may be worker/admin or anonymous public via null user id |
+| `job_media` | File metadata for issue photos, issue voice notes, and completion evidence | `id uuid PK`; `job_id uuid`; `uploaded_by_role text`; `uploaded_by_user_id uuid null`; `media_kind text`; `storage_path text`; `mime_type text`; `file_size_bytes integer`; `created_at timestamptz` | `id`, `job_id`, `uploaded_by_role`, `media_kind`, `storage_path`, `mime_type` | Many media rows per job; `media_kind` includes `issue_photo`, `issue_voice_note`, `completion_photo`, `other` |
 | `dispatch_attempts` | History of every offer attempt sent to a worker | `id uuid PK`; `job_id uuid`; `worker_profile_id uuid`; `offer_status text`; `contact_method text`; `offered_amount numeric(10,2) null`; `offer_expires_at timestamptz null`; `response_note text null`; `sent_at timestamptz`; `responded_at timestamptz null`; `created_by_admin_id uuid`; `created_at timestamptz`; `updated_at timestamptz` | `id`, `job_id`, `worker_profile_id`, `offer_status`, `contact_method`, `sent_at`, `created_by_admin_id` | Many attempts per job; belongs to one worker and one admin actor |
 | `payments` | Single current payment record per job in MVP | `id uuid PK`; `job_id uuid unique`; `amount numeric(10,2)`; `payment_method text null`; `status text`; `link_url text null`; `external_reference text null`; `reported_by_role text null`; `reported_by_user_id uuid null`; `reported_at timestamptz null`; `confirmed_by uuid null`; `confirmed_at timestamptz null`; `note text null`; `created_at timestamptz`; `updated_at timestamptz` | `id`, `job_id`, `amount`, `status` | One-to-one with job; confirmed by admin user |
 | `ratings` | Single customer-to-worker rating after closure | `id uuid PK`; `job_id uuid unique`; `customer_profile_id uuid`; `worker_profile_id uuid`; `overall_rating smallint`; `punctuality_rating smallint null`; `behavior_rating smallint null`; `quality_rating smallint null`; `review_text text null`; `created_at timestamptz` | `id`, `job_id`, `customer_profile_id`, `worker_profile_id`, `overall_rating` | One-to-one with job; belongs to customer and worker |
@@ -433,7 +431,7 @@ Standard error codes allowed in MVP: `VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBID
 | GET | `/api/public/bootstrap` | Query: none | `service_categories[]`, `localities[]`, `whatsapp_help_number`, `beta_open` | Only active categories/localities returned | `INTERNAL_ERROR` |
 | POST | `/api/public/invite/validate` | `invite_code` | `valid`, `invite_code_id`, `code_type`, `locality_id|null`, `expires_at|null` | Normalize uppercase; active; not expired; usage < max_uses | `VALIDATION_ERROR`, `NOT_FOUND`, `FORBIDDEN` |
 | POST | `/api/public/requests` | `invite_code`, `customer:{full_name,phone,alternate_phone?,locality_id,address_text,landmark?}`, `job:{service_category_id,description,preferred_date?,preferred_time_slot,payment_preference,workers_needed?,shift_type?}` | `job_id`, `public_id`, `job_ref`, `track_code`, `booking_status`, `next_step` | Re-check invite on server; normalize phone; upsert customer; validate service category/locality active; deny duplicates within 30 min for same phone+category+address | `VALIDATION_ERROR`, `RATE_LIMITED`, `CONFLICT`, `FORBIDDEN` |
-| POST | `/api/public/jobs/{publicId}/media` | `multipart/form-data`: `files[]`, `job_ref`, `phone`, `track_code` | `uploaded_count`, `media_ids[]` | Credentials required; max 3 total issue photos/job; image types only; max 5 MB each | `VALIDATION_ERROR`, `FORBIDDEN`, `UPLOAD_ERROR`, `NOT_FOUND` |
+| POST | `/api/public/jobs/{publicId}/media` | `multipart/form-data`: `file`, `media_kind` (`issue_photo`|`issue_voice_note`), `job_ref`, `phone`, `track_code` | `media_id`, `media_kind`, `uploaded_count` | Credentials required; max **5** issue photos/job; max **1** issue voice note/job; photos client-compressed where possible; image types max 5 MB; voice audio types max 5 MB, max 60s recorded client-side | `VALIDATION_ERROR`, `FORBIDDEN`, `UPLOAD_ERROR`, `NOT_FOUND` |
 | POST | `/api/public/jobs/lookup` | `job_ref`, `phone`, `track_code` | `public_id`, `booking_status`, `dispatch_status`, `payment_status`, `complaint_status`, `timeline[]`, `service_category`, `locality`, `assigned_worker_summary|null`, `amount_summary`, `actions_enabled` | Exact match on ref + normalized phone + hashed track code; rate limit failed attempts | `UNAUTHORIZED`, `NOT_FOUND`, `RATE_LIMITED` |
 | POST | `/api/public/jobs/{publicId}/payments/confirm` | `job_ref`, `phone`, `track_code`, `payment_method_used`, `amount_paid`, `external_reference?`, `note?` | `payment_id`, `payment_status`, `recorded_at` | Job must be completed or closed-awaiting-payment; amount must equal `final_amount`; non-cash needs reference when applicable | `VALIDATION_ERROR`, `INVALID_STATE_TRANSITION`, `FORBIDDEN`, `NOT_FOUND`, `CONFLICT` |
 | POST | `/api/public/jobs/{publicId}/ratings` | `job_ref`, `phone`, `track_code`, `overall_rating`, `punctuality_rating?`, `behavior_rating?`, `quality_rating?`, `review_text?` | `rating_id`, `submitted_at` | Job must be `closed`; one rating/job; scores 1–5 | `VALIDATION_ERROR`, `INVALID_STATE_TRANSITION`, `CONFLICT`, `FORBIDDEN` |
@@ -577,7 +575,7 @@ The system must keep four separate state surfaces: `booking_status`, `dispatch_s
 | V-2 | Wrong phone format | Field-level error |
 | V-3 | Description less than 20 chars | Field-level error |
 | V-4 | Non-serviceable locality selected | Submission blocked |
-| V-5 | More than 3 customer photos | Upload blocked |
+| V-5 | More than 5 customer photos or second voice note | Upload blocked |
 | V-6 | Worker uploads unsupported file type | Upload blocked |
 | V-7 | Rating outside 1–5 | Submission blocked |
 | V-8 | Complaint description too short | Submission blocked |
@@ -601,7 +599,7 @@ The system must keep four separate state surfaces: `booking_status`, `dispatch_s
 
 | ID | Scenario | Expected result |
 |---|---|---|
-| F-1 | Customer closes browser after request create but before seeing track code | Track flow still works if they have job ref + phone + track code; otherwise founder recovery required for beta |
+| F-1 | Customer closes browser after request create but before seeing track code | Same device: My Requests in `localStorage` still works. Other device: manual track with `job_ref + phone + track_code`; otherwise founder recovery for beta |
 | F-2 | Photo upload partly fails | API returns partial failure; retry allowed |
 | F-3 | Worker accepts expired offer | Conflict / invalid state |
 | F-4 | Admin tries to send second active offer before resolving first | Conflict |

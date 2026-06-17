@@ -62,7 +62,7 @@ Do **not** build three separate booking systems. Use one `pricing_mode` field an
 |---|---|
 | **Build now** | Invite gating, worker onboarding, worker verification, customer request form, photo upload, assisted booking entry from admin, category/locality configuration, worker availability toggle, dispatch queue, worker accept/decline, job status updates, payment record, ratings, complaints, activity log |
 | **Reject now** | Public worker discovery, open bids, live maps, real-time chat, in-app calling, wallet, escrow, coupons, referrals, ad system, IVR, dynamic pricing, worker social feed, native iOS app |
-| **Delay until 100 jobs** | Customer login/history, push notifications, digital quote approval screen, self-serve rescheduling, second language pack beyond launch configuration, in-app payment links, simple B2B repeat booking templates |
+| **Delay until 100 jobs** | Customer login/history, **video upload**, push notifications, digital quote approval screen, self-serve rescheduling, second language pack beyond launch configuration, in-app payment links, simple B2B repeat booking templates |
 | **Delay until 1000 jobs** | WhatsApp Cloud API, native Android app, live worker location, routing optimization, lead-fee logic, subscription billing, multi-city control panel, analytics warehouse, automated dispatch ranking, fleet-style operational dashboards |
 
 The “reject now” list is not cosmetic. It is what prevents the MVP from becoming a funded-startup fantasy. The clearest examples are native apps, WhatsApp API, maps, and OTP. Native apps add store fees and distribution overhead; WhatsApp Platform adds programmatic setup and message pricing; Maps are pay-as-you-go; OTP adds production billing and per-verification cost. All four should stay out until the first real demand loop is proven. citeturn5search0turn5search1turn4search0turn4search2turn9search2turn9search4turn8search0turn8search2turn6search0turn6search2
@@ -71,17 +71,19 @@ The most important scope lock is this sentence: **KaamSetu v1 is a workflow prod
 
 ## User Surfaces and Job Workflows
 
-**Customer app screen list.** In the MVP, the “customer app” is a customer-facing PWA, not a full authenticated consumer app.
+**Customer app screen list.** In the MVP, the “customer app” is an **installable customer-facing PWA** — design for mobile app UX, not browser-only. Camera/mic permissions when user initiates capture. No customer login.
 
 | Route or screen | Purpose |
 |---|---|
 | Landing and invite gate | Enter invite code or continue from assisted link |
 | New request form | Category, locality, address text, timing, description |
-| Photo upload | Up to 3 photos for context |
-| Request submitted | Request ID, current status, support options |
-| Track job | Friendly status view, assigned worker details once confirmed |
+| Photos & voice | Up to 5 client-compressed photos; one optional 60s voice note |
+| Request submitted | Job ref, track code backup, device-save notice |
+| My Requests (`/track`) | Saved requests on device; tap to view status; manual lookup fallback |
 | Completion and payment confirm | Mark amount paid and mode used |
 | Rating and report issue | 1–5 rating, complaint shortcut, notes |
+
+**Deferred until after 100 jobs:** customer login/history, video upload, push notifications.
 
 **Worker app screen list.** The worker app should be an invite-only PWA with a phone + PIN login.
 

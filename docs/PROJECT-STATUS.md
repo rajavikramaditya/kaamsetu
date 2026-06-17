@@ -2,7 +2,7 @@
 
 **Tagline:** Local Work. Trusted People.  
 **Last updated:** 2026-06-17  
-**Updated by:** AI Agent (Sprint 3 UX corrections)  
+**Updated by:** AI Agent (Sprint 3 docs alignment)  
 **Current phase:** Sprint 3 live + UX corrections  
 **Overall progress:** ~58%
 
@@ -136,7 +136,19 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 **UX corrections:** Multi-photo compression, optional 60s voice note, localStorage saved requests ("My Requests"), manual track fallback. No customer login.
 
-**Migrations:** `013` invite seed (done) · `014` voice media kind (founder action)
+**Sprint 3 locked decisions (implemented):**
+
+| # | Decision |
+|---|---|
+| 1 | Up to **5** issue photos per request (client-compressed before upload: max width 1280px, ~0.7 quality, WebP/JPEG preferred) |
+| 2 | **One optional voice note** per request, max 60s (`MediaRecorder` → Supabase Storage) |
+| 3 | **Video upload deferred** until after 100 jobs |
+| 4 | **No customer login** in MVP — invite + track token + device saved requests only |
+| 5 | Requests saved on same device via **`localStorage`** ("My Requests" on `/track`) |
+| 6 | **Manual track fallback** remains: `job_ref` + phone + `track_code` |
+| 7 | Customer PWA treated as **installable app experience** (camera/mic when needed; not browser-only) |
+
+**Migrations:** `013` invite seed (done) · `014` voice media kind (`issue_voice_note`)
 
 ---
 
@@ -296,6 +308,7 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Date | Checkpoint | Change |
 |---|---|---|
+| 2026-06-17 | `KS-S3-customer-flow` docs | Governance alignment: media limits, saved requests, PWA, no customer login |
 | 2026-06-17 | `KS-S3-customer-flow` UX | Multi-photo compression, voice note, saved requests on device |
 | 2026-06-17 | `KS-S3-customer-flow` build | Customer invite gate, request form, photo upload, track job; migration 013 invite seed |
 | 2026-06-17 | `KS-S2-worker-module` live | Worker login, profile, docs, dashboard, availability — founder verified on production |
