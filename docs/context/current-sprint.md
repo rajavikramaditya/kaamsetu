@@ -1,27 +1,38 @@
-# Current Sprint — Sprint 3 (Customer Request Flow)
+# Current Sprint — Sprint 3 CLOSED ✅
 
 **Checkpoint ID:** `KS-S3-customer-flow`  
-**Status:** 🟡 Live testing — final UX blockers fixed
+**Status:** ✅ COMPLETE / LIVE VERIFIED (2026-06-17, mobile PWA)
 
-## Sprint 3 tracking UX (latest)
+## Sprint 3 — closed
 
-| Path | Use case |
+Founder live verification passed on mobile:
+
+| Test | Result |
 |---|---|
-| My Requests (localStorage) | Same device — tap, no codes |
-| Track by mobile number | Other device — enter phone, pick request |
-| Advanced lookup | Backup with job ref + phone + track code |
+| Minimal request submit | ✅ |
+| Job ref + track code | ✅ |
+| Photo upload | ✅ |
+| Voice record + upload | ✅ |
+| View this request | ✅ |
+| My Requests (same device) | ✅ |
+| Mobile number lookup | ✅ |
+| Advanced lookup | ✅ |
 
-## Sprint 3 locked decisions
+## Delivered
 
-| # | Decision |
-|---|---|
-| 1 | Required: name, mobile, service, locality only |
-| 2 | Photos/voice optional; media page has "View this request" CTA |
-| 3 | Mobile lookup by phone (no track code exposed) |
-| 4 | No customer login / OTP |
+- Invite gate → minimal request form → optional media → tracking
+- Up to 5 compressed photos + optional 60s voice note
+- Same-device saved requests + mobile lookup + advanced backup
+- No customer login
 
-**Pending founder re-test:** photos page CTA, voice try-again, mobile lookup in incognito, advanced fallback.
+## Next sprint (not started)
 
-## Not in Sprint 3
+**Sprint 4 — Admin Operations** (`KS-S4-admin-operations`)
+
+Wait for founder to say **"Start Sprint 4"** before implementation.
+
+Scope preview: admin login, worker approval queue, job/request queue, assisted booking entry.
+
+## Not in Sprint 3 (deferred)
 
 Admin dashboard, dispatch, payments, notifications, maps, customer login, video, OTP.

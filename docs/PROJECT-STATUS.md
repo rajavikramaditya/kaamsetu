@@ -2,9 +2,9 @@
 
 **Tagline:** Local Work. Trusted People.  
 **Last updated:** 2026-06-17  
-**Updated by:** AI Agent (Sprint 3 founder corrections)  
-**Current phase:** Sprint 3 live — founder corrections  
-**Overall progress:** ~60%
+**Updated by:** AI Agent (Sprint 3 live verification)  
+**Current phase:** Sprint 3 complete → Sprint 4 ready (not started)  
+**Overall progress:** ~65%
 
 **Founder decision (locked):** Orai is treated as one service radius. Workers may accept jobs anywhere in Orai. Locality is used for address clarity, admin filtering, and analytics only — **not** dispatch restriction.
 
@@ -128,15 +128,23 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 |---|---|---|---|
 | 3.1 | Landing + invite gate | ✅ | Live |
 | 3.2 | Request form + validation | ✅ | Live |
-| 3.3 | Photo upload (5 max, compressed) + voice note | ✅ | Build |
-| 3.4 | Track job + device saved requests | ✅ | Build |
+| 3.3 | Photo upload (5 max, compressed) + voice note | ✅ | Live |
+| 3.4 | Track job + device saved requests + mobile lookup | ✅ | Live |
 
 **Sprint 3 exit criteria:** Customer creates request · job appears in admin queue  
-**Sprint 3 status:** 🟡 Live testing — final UX blockers fixed (`KS-S3-customer-flow`)
+**Sprint 3 status:** ✅ Complete + live verified (`KS-S3-customer-flow`)
 
-**Tracking paths:** (1) My Requests on device (2) mobile number lookup for other phone (3) advanced job ref + track code backup
+**Live verification (2026-06-17, founder — mobile PWA):**
+- Minimal request submit (name, mobile, service, locality only) ✅
+- Job ref + track code generated ✅
+- Photo upload (compressed) ✅
+- Voice record + upload ✅
+- "View this request" after media step ✅
+- My Requests on same device ✅
+- Mobile number lookup (other device) ✅
+- Advanced lookup (job ref + phone + track code) ✅
 
-**Latest fixes:** Photos page "View this request" CTA · voice permission retry · `/api/public/jobs/by-phone`
+**Tracking paths:** (1) My Requests on device (2) mobile number lookup (3) advanced backup
 
 **Sprint 3 locked decisions (implemented):**
 
@@ -145,10 +153,10 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 | 1 | **Required at submit:** name, mobile, service, locality only |
 | 2 | Address, description, photos, voice — all optional |
 | 3 | Up to 5 client-compressed photos; 1 optional 60s voice note |
-| 4 | No customer login — localStorage + **mobile lookup** + advanced fallback |
+| 4 | No customer login — localStorage + mobile lookup + advanced fallback |
 | 5 | PWA installable app experience |
 
-**Migrations:** `013` invite seed · `014` voice media · `015` optional job fields (founder: run 015 if minimal submit fails)
+**Migrations applied:** `013` invite seed · `014` voice media · `015` optional job fields
 
 ---
 
@@ -308,6 +316,7 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Date | Checkpoint | Change |
 |---|---|---|
+| 2026-06-17 | `KS-S3-customer-flow` **LIVE** | Mobile PWA customer flow verified — request, media, tracking complete |
 | 2026-06-17 | `KS-S3-customer-flow` fix | Media page CTA, voice retry, mobile lookup tracking |
 | 2026-06-17 | `KS-S3-customer-flow` fix | Minimal required fields, voice recorder, saved request auto-load |
 | 2026-06-17 | `KS-S3-customer-flow` docs | Governance alignment: media limits, saved requests, PWA, no customer login |
@@ -324,6 +333,6 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 ## 9. Next Recommended Action
 
-**For founder:** Re-test photos page → "View this request", mobile lookup in incognito, voice "Try recording again", advanced fallback.
+**For founder:** Sprint 3 closed ✅. When ready, say **"Start Sprint 4"** for admin queue + worker approval UI. Continue recruiting workers and distributing invite codes for beta customers.
 
-**For agent:** Do not start Sprint 4 until founder marks Sprint 3 ✅.
+**For agent:** Do **not** start Sprint 4 until founder explicitly requests it. Next checkpoint: `KS-S4-admin-operations`.
