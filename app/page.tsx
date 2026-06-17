@@ -36,9 +36,18 @@ export default async function Home() {
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <span className="inline-flex h-12 items-center justify-center rounded-full bg-teal-700 px-6 text-sm font-medium text-white opacity-60">
-            Start Request — Coming Soon
-          </span>
+          <Link
+            href="/request"
+            className="inline-flex h-12 items-center justify-center rounded-full bg-teal-700 px-6 text-sm font-medium text-white"
+          >
+            Start Request
+          </Link>
+          <Link
+            href="/track"
+            className="inline-flex h-12 items-center justify-center rounded-full border border-teal-700 px-6 text-sm font-medium text-teal-800"
+          >
+            Track Job
+          </Link>
           {user ? (
             <Link
               href="/worker/dashboard"
@@ -57,10 +66,10 @@ export default async function Home() {
         </div>
 
         <div className="rounded-2xl border border-stone-200 bg-white p-6 text-sm text-stone-600">
-          <p className="font-medium text-stone-900">Sprint 0 foundation</p>
+          <p className="font-medium text-stone-900">Closed beta — Orai</p>
           <p className="mt-2">
-            App scaffold, Supabase connection, and folder structure are in place.
-            Customer booking and worker flows arrive in upcoming sprints.
+            Customers can submit service requests with an invite code and track jobs
+            without creating an account. Workers can log in to manage their profile.
           </p>
           <Link
             href="/api/health"

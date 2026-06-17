@@ -1,10 +1,10 @@
 # KaamSetu — Project Status
 
 **Tagline:** Local Work. Trusted People.  
-**Last updated:** 2026-06-16  
-**Updated by:** AI Agent (founder launch config synced)  
-**Current phase:** Sprint 2 verified → Sprint 3 ready  
-**Overall progress:** ~45%
+**Last updated:** 2026-06-17  
+**Updated by:** AI Agent (Sprint 3 customer flow build)  
+**Current phase:** Sprint 3 build verified → pending live test  
+**Overall progress:** ~55%
 
 **Founder decision (locked):** Orai is treated as one service radius. Workers may accept jobs anywhere in Orai. Locality is used for address clarity, admin filtering, and analytics only — **not** dispatch restriction.
 
@@ -126,13 +126,17 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | # | Deliverable | Status | Verified |
 |---|---|---|---|
-| 3.1 | Landing + invite gate | ⬜ | — |
-| 3.2 | Request form + validation | ⬜ | — |
-| 3.3 | Photo upload | ⬜ | — |
-| 3.4 | Track job (token-lite) | ⬜ | — |
+| 3.1 | Landing + invite gate | ✅ | Build only |
+| 3.2 | Request form + validation | ✅ | Build only |
+| 3.3 | Photo upload | ✅ | Build only |
+| 3.4 | Track job (token-lite) | ✅ | Build only |
 
 **Sprint 3 exit criteria:** Customer creates request · job appears in admin queue  
-**Sprint 3 status:** 🟡 Ready to start (`KS-S3-customer-flow`)
+**Sprint 3 status:** 🟡 Build verified — pending founder live test (`KS-S3-customer-flow`)
+
+**API routes:** `POST /api/public/invite/validate`, `POST /api/public/requests`, `POST /api/public/jobs/lookup`, `POST /api/public/jobs/{publicId}/media`  
+**Customer pages:** `/request`, `/request/new`, `/request/success`, `/request/photos`, `/track`  
+**Migration:** `013_sprint3_invite_seed.sql` — invite codes `ORAI2026`, `ORAI-BETA`
 
 ---
 
@@ -292,6 +296,7 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Date | Checkpoint | Change |
 |---|---|---|
+| 2026-06-17 | `KS-S3-customer-flow` build | Customer invite gate, request form, photo upload, track job; migration 013 invite seed |
 | 2026-06-17 | `KS-S2-worker-module` live | Worker login, profile, docs, dashboard, availability — founder verified on production |
 | 2026-06-17 | `2a894d8` | Worker nav, session redirect, build stamp |
 | 2026-06-17 | `3bc2f05` | Submit-before-upload docs, duplicate doc replace |
@@ -303,6 +308,6 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 ## 9. Next Recommended Action
 
-**For founder:** Recruit 2–3 more workers via `/worker/login`. Optional: custom SMTP for email rate limits.
+**For founder:** Run migration `013_sprint3_invite_seed.sql`. Test customer flow at `/request` with invite `ORAI2026`. Confirm job in Supabase `jobs` table.
 
-**For agent:** Start **Sprint 3** (`KS-S3-customer-flow`) — invite gate, customer request form, track job.
+**For agent:** Sprint 3 build complete. After founder live test passes, mark Sprint 3 ✅ and start **Sprint 4** (admin queue).
