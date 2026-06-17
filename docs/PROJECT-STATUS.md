@@ -2,9 +2,9 @@
 
 **Tagline:** Local Work. Trusted People.  
 **Last updated:** 2026-06-17  
-**Updated by:** AI Agent (Sprint 3 live verification)  
-**Current phase:** Sprint 3 complete → Sprint 4 ready (not started)  
-**Overall progress:** ~65%
+**Updated by:** AI Agent (Sprint 4 admin operations build)  
+**Current phase:** Sprint 4 built → pending founder live verification  
+**Overall progress:** ~72%
 
 **Founder decision (locked):** Orai is treated as one service radius. Workers may accept jobs anywhere in Orai. Locality is used for address clarity, admin filtering, and analytics only — **not** dispatch restriction.
 
@@ -164,13 +164,24 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | # | Deliverable | Status | Verified |
 |---|---|---|---|
-| 4.1 | Admin login + dashboard | ⬜ | — |
-| 4.2 | Worker approval queue | ⬜ | — |
-| 4.3 | Job/request queue | ⬜ | — |
-| 4.4 | Job detail + assisted booking entry | ⬜ | — |
+| 4.1 | Admin login + dashboard | ✅ | Build OK — pending live |
+| 4.2 | Worker approval queue | ✅ | Build OK — pending live |
+| 4.3 | Job/request queue | ✅ | Build OK — pending live |
+| 4.4 | Job detail (+ assisted booking entry) | 🟡 | Job detail ✅ · assisted booking deferred |
 
 **Sprint 4 exit criteria:** Founder can operate platform manually  
-**Sprint 4 status:** ⬜ Not started
+**Sprint 4 status:** 🟡 Built (`KS-S4-admin-operations`) — awaiting founder live verification
+
+**Delivered (2026-06-17):**
+- `/admin/login` — Email OTP; requires `app_metadata.role = admin`
+- `/admin/dashboard` — metrics + quick links
+- `/admin/jobs` — request queue (default: `requested` status filter)
+- `/admin/jobs/[id]` — customer info, job details, photos, voice note (signed URLs)
+- `/admin/workers` — worker list with status filter
+- `/admin/workers/[id]` — profile review, Aadhaar/docs, approve / reject / suspend
+- Admin APIs: `/api/admin/me`, `dashboard`, `jobs`, `workers`, worker actions
+
+**Not in Sprint 4 (deferred):** Dispatch assign/offer (Sprint 5), assisted booking form, admin job status edits
 
 ---
 
@@ -218,8 +229,9 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Criterion | Status |
 |---|---|
-| Worker onboarding works | ⬜ |
-| Job creation works | ⬜ |
+| Worker onboarding works | 🟡 |
+| Job creation works | ✅ |
+| Admin can review requests + workers | 🟡 |
 | Dispatch works (serial offers) | ⬜ |
 | Payments recorded | ⬜ |
 | Complaints recorded | ⬜ |
@@ -316,6 +328,7 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Date | Checkpoint | Change |
 |---|---|---|
+| 2026-06-17 | `KS-S4-admin-operations` build | Admin login, dashboard, job queue, worker approval UI + APIs; `npm run build` OK |
 | 2026-06-17 | `KS-S3-customer-flow` **LIVE** | Mobile PWA customer flow verified — request, media, tracking complete |
 | 2026-06-17 | `KS-S3-customer-flow` fix | Media page CTA, voice retry, mobile lookup tracking |
 | 2026-06-17 | `KS-S3-customer-flow` fix | Minimal required fields, voice recorder, saved request auto-load |
@@ -333,6 +346,6 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 ## 9. Next Recommended Action
 
-**For founder:** Sprint 3 closed ✅. When ready, say **"Start Sprint 4"** for admin queue + worker approval UI. Continue recruiting workers and distributing invite codes for beta customers.
+**For founder:** Verify Sprint 4 on production — set your Supabase auth user `app_metadata.role = admin`, then test `/admin/login`, job queue, worker approve/reject/suspend.
 
-**For agent:** Do **not** start Sprint 4 until founder explicitly requests it. Next checkpoint: `KS-S4-admin-operations`.
+**For agent:** After founder live verification, mark Sprint 4 ✅ and wait for **"Start Sprint 5"** before dispatch.
