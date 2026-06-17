@@ -2,9 +2,9 @@
 
 **Tagline:** Local Work. Trusted People.  
 **Last updated:** 2026-06-17  
-**Updated by:** AI Agent (Sprint 3 docs alignment)  
-**Current phase:** Sprint 3 live + UX corrections  
-**Overall progress:** ~58%
+**Updated by:** AI Agent (Sprint 3 founder corrections)  
+**Current phase:** Sprint 3 live — founder corrections  
+**Overall progress:** ~60%
 
 **Founder decision (locked):** Orai is treated as one service radius. Workers may accept jobs anywhere in Orai. Locality is used for address clarity, admin filtering, and analytics only — **not** dispatch restriction.
 
@@ -140,15 +140,13 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | # | Decision |
 |---|---|
-| 1 | Up to **5** issue photos per request (client-compressed before upload: max width 1280px, ~0.7 quality, WebP/JPEG preferred) |
-| 2 | **One optional voice note** per request, max 60s (`MediaRecorder` → Supabase Storage) |
-| 3 | **Video upload deferred** until after 100 jobs |
-| 4 | **No customer login** in MVP — invite + track token + device saved requests only |
-| 5 | Requests saved on same device via **`localStorage`** ("My Requests" on `/track`) |
-| 6 | **Manual track fallback** remains: `job_ref` + phone + `track_code` |
-| 7 | Customer PWA treated as **installable app experience** (camera/mic when needed; not browser-only) |
+| 1 | **Required at submit:** name, mobile, service, locality only |
+| 2 | Address, description, photos, voice — all optional |
+| 3 | Up to 5 client-compressed photos; 1 optional 60s voice note |
+| 4 | No customer login — `localStorage` saved requests + manual track fallback |
+| 5 | PWA installable app experience |
 
-**Migrations:** `013` invite seed (done) · `014` voice media kind (`issue_voice_note`)
+**Migrations:** `013` invite seed · `014` voice media · `015` optional job fields (founder: run 015 if minimal submit fails)
 
 ---
 
@@ -308,6 +306,7 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Date | Checkpoint | Change |
 |---|---|---|
+| 2026-06-17 | `KS-S3-customer-flow` fix | Minimal required fields, voice recorder repair, saved request auto-load |
 | 2026-06-17 | `KS-S3-customer-flow` docs | Governance alignment: media limits, saved requests, PWA, no customer login |
 | 2026-06-17 | `KS-S3-customer-flow` UX | Multi-photo compression, voice note, saved requests on device |
 | 2026-06-17 | `KS-S3-customer-flow` build | Customer invite gate, request form, photo upload, track job; migration 013 invite seed |
@@ -322,6 +321,6 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 ## 9. Next Recommended Action
 
-**For founder:** Run migration `014_sprint3_voice_media.sql`. Re-test: 5 photos, voice note, My Requests on `/track`, manual lookup fallback.
+**For founder:** Run migration `015_sprint3_optional_job_fields.sql` if not done. Re-test: minimal submit (name+phone+service+locality only), tap saved request on `/track`, voice note on supported browser.
 
-**For agent:** After founder confirms UX re-test, mark Sprint 3 ✅ and start **Sprint 4** (admin queue).
+**For agent:** Sprint 3 corrections complete. After founder re-test passes, mark Sprint 3 ✅ — do not start Sprint 4 until founder confirms.

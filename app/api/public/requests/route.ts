@@ -39,13 +39,6 @@ export async function POST(request: Request) {
       if (error.message === "LOCALITY_NOT_SERVICEABLE") {
         return apiError("VALIDATION_ERROR", "Selected locality is not serviceable", 400);
       }
-      if (error.message === "SHIFT_FIELDS_REQUIRED") {
-        return apiError(
-          "VALIDATION_ERROR",
-          "Workers needed and shift type are required for this service",
-          400,
-        );
-      }
       if (error.message === "DUPLICATE_REQUEST") {
         return apiError(
           "CONFLICT",

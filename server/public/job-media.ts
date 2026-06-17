@@ -1,5 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { voiceFileContentType } from "@/lib/validation/customer";
+
 export const MAX_ISSUE_PHOTOS = 5;
 const MAX_VOICE_NOTES = 1;
 
@@ -70,10 +72,11 @@ export async function uploadJobVoiceNote(
     throw new Error("VOICE_LIMIT");
   }
 
+  const contentType = voiceFileContentType(file);
   const ext =
-    file.type.includes("ogg")
+    contentType.includes("ogg")
       ? "ogg"
-      : file.type.includes("mp4") || file.type.includes("aac")
+      : contentType.includes("mp4") || contentType.includes("aac")
         ? "m4a"
         : "webm";
   const storagePath = `${jobId}/voice-${Date.now()}.${ext}`;
@@ -82,7 +85,7 @@ export async function uploadJobVoiceNote(
   const { error: uploadError } = await admin.storage
     .from("job-media")
     .upload(storagePath, buffer, {
-      contentType: file.type,
+      contentType,
       upsert: false,
     });
 
@@ -95,7 +98,7 @@ export async function uploadJobVoiceNote(
       uploaded_by_role: "customer",
       media_kind: "issue_voice_note",
       storage_path: storagePath,
-      mime_type: file.type,
+      mime_type: contentType,
       file_size_bytes: file.size,
     })
     .select("id")

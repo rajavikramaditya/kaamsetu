@@ -42,12 +42,16 @@ export function JobStatusCard({ job }: { job: JobStatus }) {
           <span className="text-stone-500">Locality:</span> {job.locality}
         </p>
       )}
-      <p>
-        <span className="text-stone-500">Address:</span> {job.address_text}
-      </p>
-      <p>
-        <span className="text-stone-500">Issue:</span> {job.description}
-      </p>
+      {job.address_text ? (
+        <p>
+          <span className="text-stone-500">Address:</span> {job.address_text}
+        </p>
+      ) : null}
+      {job.description ? (
+        <p>
+          <span className="text-stone-500">Issue:</span> {job.description}
+        </p>
+      ) : null}
 
       <div className="mt-2 grid grid-cols-2 gap-2 border-t border-stone-100 pt-3 text-xs">
         <div>

@@ -2,22 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const MAX_SECONDS = 60;
+import {
+  VOICE_UNSUPPORTED_MESSAGE,
+  createVoiceMediaRecorder,
+  isVoiceRecordingSupported,
+  voiceBlobToFile,
+} from "@/lib/customer/voice-recorder";
 
-function pickMimeType(): string {
-  const candidates = [
-    "audio/webm;codecs=opus",
-    "audio/webm",
-    "audio/ogg;codecs=opus",
-    "audio/mp4",
-  ];
-  for (const type of candidates) {
-    if (typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(type)) {
-      return type;
-    }
-  }
-  return "audio/webm";
-}
+const MAX_SECONDS = 60;
 
 type VoiceNoteRecorderProps = {
   disabled?: boolean;
@@ -36,8 +28,10 @@ export function VoiceNoteRecorder({
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [supported] = useState(() => isVoiceRecordingSupported());
 
   const recorderRef = useRef<MediaRecorder | null>(null);
+  const mimeTypeRef = useRef("audio/webm");
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -61,8 +55,9 @@ export function VoiceNoteRecorder({
 
   async function startRecording() {
     setError(null);
-    if (typeof window === "undefined" || !navigator.mediaDevices?.getUserMedia) {
-      setError("Recording is not supported on this device.");
+
+    if (!supported) {
+      setError(VOICE_UNSUPPORTED_MESSAGE);
       return;
     }
 
@@ -71,19 +66,39 @@ export function VoiceNoteRecorder({
       streamRef.current = stream;
       chunksRef.current = [];
 
-      const mimeType = pickMimeType();
-      const recorder = new MediaRecorder(stream, { mimeType });
+      const { recorder, mimeType } = createVoiceMediaRecorder(stream);
+      mimeTypeRef.current = mimeType;
       recorderRef.current = recorder;
 
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunksRef.current.push(e.data);
       };
 
+      recorder.onerror = () => {
+        cleanupStream();
+        setError("Recording failed. Try again or submit without voice.");
+        setStatus("idle");
+      };
+
       recorder.onstop = () => {
         cleanupStream();
-        const blob = new Blob(chunksRef.current, { type: mimeType });
-        const ext = mimeType.includes("ogg") ? "ogg" : mimeType.includes("mp4") ? "m4a" : "webm";
-        const file = new File([blob], `voice-note.${ext}`, { type: blob.type });
+        if (chunksRef.current.length === 0) {
+          setError("Recording failed. Try again or submit without voice.");
+          setStatus("idle");
+          return;
+        }
+
+        const blob = new Blob(chunksRef.current, {
+          type: mimeTypeRef.current.split(";")[0] || "audio/webm",
+        });
+
+        if (blob.size === 0) {
+          setError("Recording failed. Try again or submit without voice.");
+          setStatus("idle");
+          return;
+        }
+
+        const file = voiceBlobToFile(blob, mimeTypeRef.current);
         const url = URL.createObjectURL(blob);
         setPreviewUrl((prev) => {
           if (prev) URL.revokeObjectURL(prev);
@@ -99,23 +114,37 @@ export function VoiceNoteRecorder({
 
       timerRef.current = setInterval(() => {
         setSeconds((s) => {
-          if (s + 1 >= MAX_SECONDS) {
+          const next = s + 1;
+          if (next >= MAX_SECONDS) {
             stopRecording();
             return MAX_SECONDS;
           }
-          return s + 1;
+          return next;
         });
       }, 1000);
-    } catch {
+    } catch (err) {
       cleanupStream();
-      setError("Microphone permission denied or unavailable.");
+      const denied =
+        err instanceof DOMException &&
+        (err.name === "NotAllowedError" || err.name === "PermissionDeniedError");
+      setError(
+        denied
+          ? "Microphone permission denied. You can submit without voice."
+          : "Could not start recording. You can submit without voice.",
+      );
       setStatus("idle");
     }
   }
 
   function stopRecording() {
-    if (recorderRef.current?.state === "recording") {
-      recorderRef.current.stop();
+    const recorder = recorderRef.current;
+    if (recorder?.state === "recording") {
+      try {
+        recorder.requestData();
+      } catch {
+        // Some browsers omit requestData support
+      }
+      recorder.stop();
     } else {
       cleanupStream();
     }
@@ -142,10 +171,15 @@ export function VoiceNoteRecorder({
       <div>
         <p className="text-sm font-medium text-stone-900">Voice note (optional)</p>
         <p className="mt-1 text-xs text-stone-500">
-          Record up to 60 seconds describing the issue. Microphone access is requested only
-          when you tap Record.
+          Record up to 60 seconds. Microphone access is requested only when you tap Record.
         </p>
       </div>
+
+      {!supported && (
+        <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          {VOICE_UNSUPPORTED_MESSAGE}
+        </p>
+      )}
 
       {status === "recording" && (
         <p className="text-sm font-medium text-red-700">
@@ -161,42 +195,44 @@ export function VoiceNoteRecorder({
         <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">{error}</p>
       )}
 
-      <div className="flex flex-wrap gap-2">
-        {status === "idle" && (
-          <button
-            type="button"
-            disabled={disabled || uploading}
-            onClick={startRecording}
-            className="rounded-full bg-stone-800 px-5 py-2.5 text-sm font-medium text-white disabled:opacity-60"
-          >
-            Record voice note
-          </button>
-        )}
+      {supported && (
+        <div className="flex flex-wrap gap-2">
+          {status === "idle" && (
+            <button
+              type="button"
+              disabled={disabled || uploading}
+              onClick={startRecording}
+              className="rounded-full bg-stone-800 px-5 py-2.5 text-sm font-medium text-white disabled:opacity-60"
+            >
+              Record voice note
+            </button>
+          )}
 
-        {status === "recording" && (
-          <button
-            type="button"
-            onClick={stopRecording}
-            className="rounded-full bg-red-700 px-5 py-2.5 text-sm font-medium text-white"
-          >
-            Stop recording
-          </button>
-        )}
+          {status === "recording" && (
+            <button
+              type="button"
+              onClick={stopRecording}
+              className="rounded-full bg-red-700 px-5 py-2.5 text-sm font-medium text-white"
+            >
+              Stop recording
+            </button>
+          )}
 
-        {status === "recorded" && !uploading && (
-          <button
-            type="button"
-            onClick={resetRecording}
-            className="rounded-full border border-stone-300 px-5 py-2.5 text-sm font-medium text-stone-700"
-          >
-            Re-record
-          </button>
-        )}
+          {status === "recorded" && !uploading && (
+            <button
+              type="button"
+              onClick={resetRecording}
+              className="rounded-full border border-stone-300 px-5 py-2.5 text-sm font-medium text-stone-700"
+            >
+              Re-record
+            </button>
+          )}
 
-        {uploading && (
-          <span className="self-center text-sm text-stone-600">Uploading voice note…</span>
-        )}
-      </div>
+          {uploading && (
+            <span className="self-center text-sm text-stone-600">Uploading voice note…</span>
+          )}
+        </div>
+      )}
     </div>
   );
 }

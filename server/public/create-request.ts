@@ -38,12 +38,6 @@ export async function createCustomerRequest(
     throw new Error("LOCALITY_NOT_SERVICEABLE");
   }
 
-  if (category.requires_shift_fields) {
-    if (!input.workers_needed || !input.shift_type) {
-      throw new Error("SHIFT_FIELDS_REQUIRED");
-    }
-  }
-
   const since = new Date(Date.now() - 30 * 60 * 1000).toISOString();
   const { data: existingCustomerEarly } = await admin
     .from("customer_profiles")
@@ -52,14 +46,20 @@ export async function createCustomerRequest(
     .maybeSingle();
 
   if (existingCustomerEarly) {
-    const { data: dup } = await admin
+    let dupQuery = admin
       .from("jobs")
       .select("id")
       .eq("customer_profile_id", existingCustomerEarly.id)
       .eq("service_category_id", input.service_category_id)
-      .eq("address_text", input.address_text)
+      .eq("locality_id", input.locality_id)
       .gte("created_at", since)
       .limit(1);
+
+    if (input.address_text && input.address_text.length > 0) {
+      dupQuery = dupQuery.eq("address_text", input.address_text);
+    }
+
+    const { data: dup } = await dupQuery;
 
     if (dup?.length) throw new Error("DUPLICATE_REQUEST");
   }
@@ -79,7 +79,7 @@ export async function createCustomerRequest(
         full_name: input.full_name,
         alternate_phone: input.alternate_phone ?? null,
         locality_id: input.locality_id,
-        default_address_text: input.address_text,
+        default_address_text: input.address_text || null,
         landmark: input.landmark ?? null,
         invite_code_id: invite.id,
       })
@@ -94,7 +94,7 @@ export async function createCustomerRequest(
         phone: input.phone,
         alternate_phone: input.alternate_phone ?? null,
         locality_id: input.locality_id,
-        default_address_text: input.address_text,
+        default_address_text: input.address_text || null,
         landmark: input.landmark ?? null,
         invite_code_id: invite.id,
         language_code: "hi",
@@ -123,8 +123,8 @@ export async function createCustomerRequest(
       locality_id: input.locality_id,
       request_source: "pwa",
       pricing_type: category.pricing_type_default,
-      description: input.description,
-      address_text: input.address_text,
+      description: input.description || "",
+      address_text: input.address_text || "",
       landmark: input.landmark ?? null,
       preferred_date: input.preferred_date ?? null,
       preferred_time_slot: input.preferred_time_slot,

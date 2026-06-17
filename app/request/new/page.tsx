@@ -86,19 +86,21 @@ export default function NewRequestPage() {
         full_name: form.full_name,
         phone: form.phone,
         locality_id: form.locality_id,
-        address_text: form.address_text,
         service_category_id: form.service_category_id,
-        description: form.description,
         preferred_time_slot: form.preferred_time_slot,
         payment_preference: form.payment_preference,
       };
 
+      if (form.address_text.trim()) payload.address_text = form.address_text.trim();
+      if (form.description.trim()) payload.description = form.description.trim();
       if (form.alternate_phone) payload.alternate_phone = form.alternate_phone;
       if (form.landmark) payload.landmark = form.landmark;
       if (form.preferred_date) payload.preferred_date = form.preferred_date;
 
-      if (needsShiftFields) {
+      if (needsShiftFields && form.workers_needed) {
         payload.workers_needed = Number(form.workers_needed);
+      }
+      if (needsShiftFields && form.shift_type) {
         payload.shift_type = form.shift_type;
       }
 
@@ -158,8 +160,8 @@ export default function NewRequestPage() {
       </p>
 
       <p className="text-sm text-stone-600">
-        Tell us what you need. A KaamSetu coordinator will review and assign a
-        verified worker.
+        Only name, mobile, service, and locality are required. Add more details if you have
+        them — our team can call you for the rest.
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -236,14 +238,12 @@ export default function NewRequestPage() {
         </label>
 
         <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium">Full address *</span>
+          <span className="font-medium">Full address (optional)</span>
           <textarea
-            required
             rows={3}
-            minLength={10}
             value={form.address_text}
             onChange={(e) => setForm({ ...form, address_text: e.target.value })}
-            placeholder="House no., street, area"
+            placeholder="House no., street, area — we can call for this"
             className="rounded-xl border border-stone-300 bg-white px-4 py-3"
           />
         </label>
@@ -258,15 +258,13 @@ export default function NewRequestPage() {
         </label>
 
         <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium">Describe the issue *</span>
+          <span className="font-medium">Describe the issue (optional)</span>
           <textarea
-            required
             rows={4}
-            minLength={20}
             maxLength={500}
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
-            placeholder="What needs to be done? (min 20 characters)"
+            placeholder="What needs to be done? — or tell us on a call"
             className="rounded-xl border border-stone-300 bg-white px-4 py-3"
           />
         </label>
@@ -282,9 +280,8 @@ export default function NewRequestPage() {
         </label>
 
         <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium">Preferred time *</span>
+          <span className="font-medium">Preferred time (optional)</span>
           <select
-            required
             value={form.preferred_time_slot}
             onChange={(e) =>
               setForm({ ...form, preferred_time_slot: e.target.value })
@@ -300,7 +297,7 @@ export default function NewRequestPage() {
         </label>
 
         <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium">Payment preference</span>
+          <span className="font-medium">Payment preference (optional)</span>
           <select
             value={form.payment_preference}
             onChange={(e) =>
@@ -317,9 +314,8 @@ export default function NewRequestPage() {
         {needsShiftFields && (
           <>
             <label className="flex flex-col gap-1 text-sm">
-              <span className="font-medium">Workers needed *</span>
+              <span className="font-medium">Workers needed (optional)</span>
               <input
-                required
                 type="number"
                 min={1}
                 max={20}
@@ -332,9 +328,8 @@ export default function NewRequestPage() {
             </label>
 
             <label className="flex flex-col gap-1 text-sm">
-              <span className="font-medium">Shift type *</span>
+              <span className="font-medium">Shift type (optional)</span>
               <select
-                required
                 value={form.shift_type}
                 onChange={(e) => setForm({ ...form, shift_type: e.target.value })}
                 className="rounded-xl border border-stone-300 bg-white px-4 py-3"

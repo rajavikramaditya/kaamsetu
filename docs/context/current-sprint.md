@@ -1,7 +1,7 @@
 # Current Sprint — Sprint 3 (Customer Request Flow)
 
 **Checkpoint ID:** `KS-S3-customer-flow`  
-**Status:** 🟡 Live test passed — UX corrections deployed (pending migration 014 + re-test)
+**Status:** 🟡 Live test passed — founder corrections deployed (run migration 015)
 
 ## Sprint 2 — closed ✅
 
@@ -25,21 +25,20 @@ Live verified on production (2026-06-17):
 
 | # | Decision | Implementation |
 |---|---|---|
-| 1 | Up to 5 compressed issue photos | Client compress → upload; max 1280px, ~0.7 quality, WebP/JPEG |
-| 2 | One optional voice note, max 60s | `MediaRecorder`; mic permission on record tap only |
-| 3 | Video upload deferred | After 100 jobs — not in MVP |
-| 4 | No customer login | Invite + track token + device saved requests only |
-| 5 | Device saved requests | `localStorage` — "My Requests" on `/track` |
-| 6 | Manual track fallback | `job_ref` + phone + `track_code` lookup form |
-| 7 | PWA = installable app | Camera/mic when needed; low-friction mobile-first UX |
+| 1 | **Required fields only:** name, mobile, service, locality | Address, description, media optional |
+| 2 | Up to 5 compressed issue photos | Client compress → upload |
+| 3 | One optional voice note, max 60s | Robust MediaRecorder MIME fallback |
+| 4 | No customer login | localStorage saved requests |
+| 5 | Same-device tracking | "View this request" + My Requests tap-to-load |
+| 6 | Manual track fallback | `job_ref` + phone + `track_code` |
 
-**Migration 014:** `issue_voice_note` media kind — founder must run in Supabase
+**Migrations:** `014` voice media kind · `015` optional address/description (founder must run 015)
 
 ## Sprint 3 exit criteria
 
 Customer creates request → job record exists for admin queue (Sprint 4 UI).
 
-**Pending:** Founder runs migration `014_sprint3_voice_media.sql`, re-test photos + voice + saved requests.
+**Pending:** Founder runs migration `015_sprint3_optional_job_fields.sql`. Re-test minimal submit + saved request tap + voice note.
 
 ## Not in Sprint 3
 
