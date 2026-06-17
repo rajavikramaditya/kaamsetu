@@ -96,6 +96,7 @@ async function fetchJobsByPhone(phone: string): Promise<PhoneJobSummary[]> {
 
 export default function TrackJobPage() {
   const [savedRequests, setSavedRequests] = useState<SavedRequest[]>([]);
+  const [showAlternateTracking, setShowAlternateTracking] = useState(false);
   const [phoneLookup, setPhoneLookup] = useState("");
   const [phoneResults, setPhoneResults] = useState<PhoneJobSummary[]>([]);
   const [phoneLoading, setPhoneLoading] = useState(false);
@@ -114,6 +115,10 @@ export default function TrackJobPage() {
   const [loadingSaved, setLoadingSaved] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [job, setJob] = useState<JobStatus | null>(null);
+
+  const hasSavedRequests = savedRequests.length > 0;
+  const pageTitle = hasSavedRequests ? "My Requests" : "Track Request";
+  const showTrackingForms = !hasSavedRequests || showAlternateTracking;
 
   const showJob = useCallback((result: JobStatus) => {
     setJob(result);
@@ -200,6 +205,7 @@ export default function TrackJobPage() {
         return;
       }
 
+      setShowAlternateTracking(true);
       setAdvancedForm((prev) => ({ ...prev, job_ref: normalized }));
       setShowAdvancedForm(true);
       setError("Open this request with your mobile number below, or use advanced lookup.");
@@ -225,6 +231,10 @@ export default function TrackJobPage() {
         job_ref: prefilledJobRef,
         phone: prefilledPhone || prev.phone,
       }));
+    }
+
+    if (prefilledPhone || prefilledJobRef) {
+      setShowAlternateTracking(true);
     }
 
     if (openRef) {
@@ -277,162 +287,188 @@ export default function TrackJobPage() {
   const normalizedPhone = phoneLookup.replace(/\D/g, "").slice(-10);
 
   return (
-    <CustomerShell title="My Requests" active="track">
-      {savedRequests.length > 0 && (
-        <section className="flex flex-col gap-3">
-          <div>
-            <h2 className="text-sm font-semibold text-stone-900">My Requests on this device</h2>
-            <p className="mt-1 text-xs text-stone-500">
+    <CustomerShell title={pageTitle} active="track">
+      {hasSavedRequests ? (
+        <>
+          <section className="flex flex-col gap-3">
+            <p className="text-xs text-stone-500">
               Tap a saved request — no codes needed on this phone.
             </p>
-          </div>
 
-          <div className="flex flex-col gap-2">
-            {savedRequests.map((request) => (
-              <SavedRequestCard
-                key={request.job_ref}
-                request={request}
-                loading={loadingSaved === request.job_ref}
-                onOpen={() => openSavedRequest(request)}
-              />
-            ))}
-          </div>
-        </section>
-      )}
+            <div className="flex flex-col gap-2">
+              {savedRequests.map((request) => (
+                <SavedRequestCard
+                  key={request.job_ref}
+                  request={request}
+                  loading={loadingSaved === request.job_ref}
+                  onOpen={() => openSavedRequest(request)}
+                />
+              ))}
+            </div>
+          </section>
 
-      {savedRequests.length === 0 && (
-        <p className="rounded-xl bg-stone-100 px-4 py-3 text-sm text-stone-600">
-          No saved requests on this device yet. Submit a request or track by mobile number
-          below.
-        </p>
-      )}
-
-      <section className="flex flex-col gap-3 border-t border-stone-200 pt-4">
-        <div>
-          <h2 className="text-sm font-semibold text-stone-900">Track by mobile number</h2>
-          <p className="mt-1 text-sm text-stone-600">
-            On another phone? Enter the mobile number used when submitting the request.
-          </p>
-        </div>
-
-        <form onSubmit={handlePhoneLookup} className="flex flex-col gap-3">
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium">Mobile number *</span>
-            <input
-              required
-              type="tel"
-              inputMode="numeric"
-              maxLength={10}
-              value={phoneLookup}
-              onChange={(e) => setPhoneLookup(e.target.value)}
-              placeholder="10-digit mobile"
-              className="rounded-xl border border-stone-300 bg-white px-4 py-3"
-            />
-          </label>
-
-          {phoneError && (
-            <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">{phoneError}</p>
-          )}
-
-          <button
-            type="submit"
-            disabled={phoneLoading}
-            className="rounded-full bg-teal-700 px-6 py-3 text-sm font-medium text-white disabled:opacity-60"
+          <Link
+            href="/request"
+            className="rounded-full bg-teal-700 px-6 py-3 text-center text-sm font-medium text-white"
           >
-            {phoneLoading ? "Searching…" : "Find my requests"}
-          </button>
-        </form>
+            New Request
+          </Link>
 
-        {phoneResults.length > 0 && (
-          <div className="flex flex-col gap-2">
-            {phoneResults.map((item) => (
-              <PhoneJobSummaryCard
-                key={item.job_ref}
-                job={item}
-                loading={loadingPhoneJob === item.job_ref}
-                onOpen={() => openPhoneJob(item, normalizedPhone)}
-              />
-            ))}
-          </div>
-        )}
-      </section>
-
-      <section className="flex flex-col gap-3 border-t border-stone-200 pt-4">
-        <button
-          type="button"
-          onClick={() => setShowAdvancedForm((v) => !v)}
-          className="text-left text-sm font-medium text-teal-800 underline-offset-4 hover:underline"
-        >
-          {showAdvancedForm
-            ? "Hide advanced lookup"
-            : "Advanced lookup (job ref + phone + track code)"}
-        </button>
-
-        {showAdvancedForm && (
-          <form onSubmit={handleAdvancedSubmit} className="flex flex-col gap-4">
-            <p className="text-sm text-stone-600">
-              Backup if you saved your job reference and 6-digit track code.
-            </p>
-
-            <label className="flex flex-col gap-1 text-sm">
-              <span className="font-medium">Job reference *</span>
-              <input
-                required
-                value={advancedForm.job_ref}
-                onChange={(e) =>
-                  setAdvancedForm({ ...advancedForm, job_ref: e.target.value.toUpperCase() })
-                }
-                placeholder="KS-000001"
-                className="rounded-xl border border-stone-300 bg-white px-4 py-3 uppercase"
-              />
-            </label>
-
-            <label className="flex flex-col gap-1 text-sm">
-              <span className="font-medium">Mobile number *</span>
-              <input
-                required
-                type="tel"
-                inputMode="numeric"
-                maxLength={10}
-                value={advancedForm.phone}
-                onChange={(e) =>
-                  setAdvancedForm({ ...advancedForm, phone: e.target.value })
-                }
-                className="rounded-xl border border-stone-300 bg-white px-4 py-3"
-              />
-            </label>
-
-            <label className="flex flex-col gap-1 text-sm">
-              <span className="font-medium">Track code *</span>
-              <input
-                required
-                inputMode="numeric"
-                maxLength={6}
-                value={advancedForm.track_code}
-                onChange={(e) =>
-                  setAdvancedForm({ ...advancedForm, track_code: e.target.value })
-                }
-                placeholder="6 digits"
-                className="rounded-xl border border-stone-300 bg-white px-4 py-3 font-mono tracking-widest"
-              />
-            </label>
-
-            {advancedError && (
-              <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">
-                {advancedError}
-              </p>
-            )}
-
+          {!showAlternateTracking && (
             <button
-              type="submit"
-              disabled={advancedLoading}
-              className="rounded-full border border-teal-700 px-6 py-3 text-sm font-medium text-teal-800 disabled:opacity-60"
+              type="button"
+              onClick={() => setShowAlternateTracking(true)}
+              className="text-sm text-teal-700 underline-offset-4 hover:underline"
             >
-              {advancedLoading ? "Looking up…" : "Advanced track"}
+              Track another request
             </button>
-          </form>
-        )}
-      </section>
+          )}
+        </>
+      ) : (
+        <>
+          <p className="text-sm text-stone-600">
+            Track an existing request or submit a new one.
+          </p>
+
+          <Link
+            href="/request"
+            className="rounded-full bg-teal-700 px-6 py-3 text-center text-sm font-medium text-white"
+          >
+            New Request
+          </Link>
+        </>
+      )}
+
+      {showTrackingForms && (
+        <>
+          <section className="flex flex-col gap-3 border-t border-stone-200 pt-4">
+            <div>
+              <h2 className="text-sm font-semibold text-stone-900">Track by mobile number</h2>
+              <p className="mt-1 text-sm text-stone-600">
+                Enter the mobile number used when submitting the request.
+              </p>
+            </div>
+
+            <form onSubmit={handlePhoneLookup} className="flex flex-col gap-3">
+              <label className="flex flex-col gap-1 text-sm">
+                <span className="font-medium">Mobile number *</span>
+                <input
+                  required
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={10}
+                  value={phoneLookup}
+                  onChange={(e) => setPhoneLookup(e.target.value)}
+                  placeholder="10-digit mobile"
+                  className="rounded-xl border border-stone-300 bg-white px-4 py-3"
+                />
+              </label>
+
+              {phoneError && (
+                <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">{phoneError}</p>
+              )}
+
+              <button
+                type="submit"
+                disabled={phoneLoading}
+                className="rounded-full bg-teal-700 px-6 py-3 text-sm font-medium text-white disabled:opacity-60"
+              >
+                {phoneLoading ? "Searching…" : "Find my requests"}
+              </button>
+            </form>
+
+            {phoneResults.length > 0 && (
+              <div className="flex flex-col gap-2">
+                {phoneResults.map((item) => (
+                  <PhoneJobSummaryCard
+                    key={item.job_ref}
+                    job={item}
+                    loading={loadingPhoneJob === item.job_ref}
+                    onOpen={() => openPhoneJob(item, normalizedPhone)}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+
+          <section className="flex flex-col gap-3 border-t border-stone-200 pt-4">
+            <button
+              type="button"
+              onClick={() => setShowAdvancedForm((v) => !v)}
+              className="text-left text-sm font-medium text-teal-800 underline-offset-4 hover:underline"
+            >
+              {showAdvancedForm
+                ? "Hide advanced lookup"
+                : "Advanced lookup using job ref + track code"}
+            </button>
+
+            {showAdvancedForm && (
+              <form onSubmit={handleAdvancedSubmit} className="flex flex-col gap-4">
+                <p className="text-sm text-stone-600">
+                  Backup if you saved your job reference and 6-digit track code.
+                </p>
+
+                <label className="flex flex-col gap-1 text-sm">
+                  <span className="font-medium">Job reference *</span>
+                  <input
+                    required
+                    value={advancedForm.job_ref}
+                    onChange={(e) =>
+                      setAdvancedForm({ ...advancedForm, job_ref: e.target.value.toUpperCase() })
+                    }
+                    placeholder="KS-000001"
+                    className="rounded-xl border border-stone-300 bg-white px-4 py-3 uppercase"
+                  />
+                </label>
+
+                <label className="flex flex-col gap-1 text-sm">
+                  <span className="font-medium">Mobile number *</span>
+                  <input
+                    required
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={10}
+                    value={advancedForm.phone}
+                    onChange={(e) =>
+                      setAdvancedForm({ ...advancedForm, phone: e.target.value })
+                    }
+                    className="rounded-xl border border-stone-300 bg-white px-4 py-3"
+                  />
+                </label>
+
+                <label className="flex flex-col gap-1 text-sm">
+                  <span className="font-medium">Track code *</span>
+                  <input
+                    required
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={advancedForm.track_code}
+                    onChange={(e) =>
+                      setAdvancedForm({ ...advancedForm, track_code: e.target.value })
+                    }
+                    placeholder="6 digits"
+                    className="rounded-xl border border-stone-300 bg-white px-4 py-3 font-mono tracking-widest"
+                  />
+                </label>
+
+                {advancedError && (
+                  <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">
+                    {advancedError}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={advancedLoading}
+                  className="rounded-full border border-teal-700 px-6 py-3 text-sm font-medium text-teal-800 disabled:opacity-60"
+                >
+                  {advancedLoading ? "Looking up…" : "Advanced track"}
+                </button>
+              </form>
+            )}
+          </section>
+        </>
+      )}
 
       {error && !job && (
         <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900">{error}</p>
@@ -448,13 +484,6 @@ export default function TrackJobPage() {
           Add photos or voice note →
         </Link>
       )}
-
-      <Link
-        href="/request"
-        className="text-center text-sm text-teal-700 underline-offset-4 hover:underline"
-      >
-        Submit a new request
-      </Link>
     </CustomerShell>
   );
 }
