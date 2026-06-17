@@ -3,8 +3,8 @@
 **Tagline:** Local Work. Trusted People.  
 **Last updated:** 2026-06-16  
 **Updated by:** AI Agent (founder launch config synced)  
-**Current phase:** Sprint 2 complete → Sprint 3 ready  
-**Overall progress:** ~40%
+**Current phase:** Sprint 2 verified → Sprint 3 ready  
+**Overall progress:** ~45%
 
 **Founder decision (locked):** Orai is treated as one service radius. Workers may accept jobs anywhere in Orai. Locality is used for address clarity, admin filtering, and analytics only — **not** dispatch restriction.
 
@@ -108,7 +108,17 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 | 2.4 | Worker dashboard + availability toggle | ✅ | `/worker/dashboard` |
 
 **Sprint 2 exit criteria:** Worker can login · complete profile · upload documents · toggle availability when approved  
-**Sprint 2 status:** ✅ Complete — Email OTP login live; enable Email provider in Supabase Auth
+**Sprint 2 status:** ✅ Complete + live verified (`KS-S2-worker-module`)
+
+**Live verification (2026-06-17, founder):**
+- Email OTP login + magic link callback ✅
+- Profile submit (Plumber, Indira Nagar, Aadhaar) ✅
+- Founder approval in Supabase ✅
+- Dashboard: Approved, Available/Busy toggle ✅
+- Nav: Dashboard + Profile links ✅
+- Build stamp visible on deploy ✅
+
+**Not in Sprint 2 (deferred):** Phone OTP (needs SMS provider), admin approval UI (Sprint 4), job offers (Sprint 5)
 
 ---
 
@@ -122,7 +132,7 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 | 3.4 | Track job (token-lite) | ⬜ | — |
 
 **Sprint 3 exit criteria:** Customer creates request · job appears in admin queue  
-**Sprint 3 status:** ⬜ Not started
+**Sprint 3 status:** 🟡 Ready to start (`KS-S3-customer-flow`)
 
 ---
 
@@ -282,6 +292,9 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Date | Checkpoint | Change |
 |---|---|---|
+| 2026-06-17 | `KS-S2-worker-module` live | Worker login, profile, docs, dashboard, availability — founder verified on production |
+| 2026-06-17 | `2a894d8` | Worker nav, session redirect, build stamp |
+| 2026-06-17 | `3bc2f05` | Submit-before-upload docs, duplicate doc replace |
 | 2026-06-16 | Locality rule | Orai = one radius; locality display-only, not dispatch filter |
 | 2026-06-16 | `KS-S1-database-rls` | Migrations live; bootstrap verified |
 | 2026-06-16 | `KS-S0-foundation` (`b873301`) | Pushed: Supabase client, health API, landing, docs |
@@ -290,6 +303,6 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 ## 9. Next Recommended Action
 
-**For founder:** Phase 3 — recruit workers. WhatsApp Business setup.
+**For founder:** Recruit 2–3 more workers via `/worker/login`. Optional: custom SMTP for email rate limits.
 
-**For agent:** Sprint 3 (`KS-S3-customer-flow`) — customer request form, invite gate, track job.
+**For agent:** Start **Sprint 3** (`KS-S3-customer-flow`) — invite gate, customer request form, track job.

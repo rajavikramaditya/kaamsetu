@@ -1,19 +1,35 @@
-# Current Sprint — Sprint 2 (Worker Module)
+# Current Sprint — Sprint 3 (Customer Request Flow)
 
-**Checkpoint ID:** `KS-S2-worker-module`  
-**Status:** ✅ Complete
+**Checkpoint ID:** `KS-S3-customer-flow`  
+**Status:** 🟡 Ready to start
 
-## Worker login strategy (locked)
+## Sprint 2 — closed ✅
 
-- **Email OTP** — permanent low-cost login for closed beta
-- **Phone OTP** — code path ready; enabled when SMS provider is configured (no Twilio/MessageBird now)
-- **Profile phone** — mandatory on worker profile (identity tied to phone + Aadhaar)
-- UI wording: *"Login with Email OTP now. Phone OTP will be enabled later when SMS provider is configured."*
+Live verified on production (2026-06-17):
+- Worker Email OTP login
+- Profile + Aadhaar upload
+- Founder approval → Approved dashboard
+- Available / Busy toggle
+- Dashboard + Profile navigation
 
-## Founder action
+## Sprint 3 scope
 
-Enable **Email** provider in Supabase Auth (OTP emails are included).
+| # | Deliverable |
+|---|---|
+| 3.1 | Landing + invite code gate |
+| 3.2 | Customer request form + validation |
+| 3.3 | Job photo upload |
+| 3.4 | Track job (job_ref + phone + track_code) |
 
-## Next
+## Sprint 3 exit criteria
 
-Sprint 3 — Customer request flow
+Customer creates request → job record exists for admin queue (Sprint 4 UI).
+
+## Not in Sprint 3
+
+- Admin dashboard, dispatch, payments, notifications, maps
+
+## Founder action (parallel)
+
+- Share worker login link with 2–3 more workers
+- Prepare 5–10 invite codes for beta customers (Supabase `invite_codes` or Sprint 3 seed)
