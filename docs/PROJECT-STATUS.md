@@ -2,9 +2,9 @@
 
 **Tagline:** Local Work. Trusted People.  
 **Last updated:** 2026-06-17  
-**Updated by:** AI Agent (Sprint 3 customer flow build)  
-**Current phase:** Sprint 3 build verified → pending live test  
-**Overall progress:** ~55%
+**Updated by:** AI Agent (Sprint 3 UX corrections)  
+**Current phase:** Sprint 3 live + UX corrections  
+**Overall progress:** ~58%
 
 **Founder decision (locked):** Orai is treated as one service radius. Workers may accept jobs anywhere in Orai. Locality is used for address clarity, admin filtering, and analytics only — **not** dispatch restriction.
 
@@ -126,17 +126,17 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | # | Deliverable | Status | Verified |
 |---|---|---|---|
-| 3.1 | Landing + invite gate | ✅ | Build only |
-| 3.2 | Request form + validation | ✅ | Build only |
-| 3.3 | Photo upload | ✅ | Build only |
-| 3.4 | Track job (token-lite) | ✅ | Build only |
+| 3.1 | Landing + invite gate | ✅ | Live |
+| 3.2 | Request form + validation | ✅ | Live |
+| 3.3 | Photo upload (5 max, compressed) + voice note | ✅ | Build |
+| 3.4 | Track job + device saved requests | ✅ | Build |
 
 **Sprint 3 exit criteria:** Customer creates request · job appears in admin queue  
-**Sprint 3 status:** 🟡 Build verified — pending founder live test (`KS-S3-customer-flow`)
+**Sprint 3 status:** 🟡 Live test passed — UX corrections pushed (`KS-S3-customer-flow`)
 
-**API routes:** `POST /api/public/invite/validate`, `POST /api/public/requests`, `POST /api/public/jobs/lookup`, `POST /api/public/jobs/{publicId}/media`  
-**Customer pages:** `/request`, `/request/new`, `/request/success`, `/request/photos`, `/track`  
-**Migration:** `013_sprint3_invite_seed.sql` — invite codes `ORAI2026`, `ORAI-BETA`
+**UX corrections:** Multi-photo compression, optional 60s voice note, localStorage saved requests ("My Requests"), manual track fallback. No customer login.
+
+**Migrations:** `013` invite seed (done) · `014` voice media kind (founder action)
 
 ---
 
@@ -296,6 +296,7 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Date | Checkpoint | Change |
 |---|---|---|
+| 2026-06-17 | `KS-S3-customer-flow` UX | Multi-photo compression, voice note, saved requests on device |
 | 2026-06-17 | `KS-S3-customer-flow` build | Customer invite gate, request form, photo upload, track job; migration 013 invite seed |
 | 2026-06-17 | `KS-S2-worker-module` live | Worker login, profile, docs, dashboard, availability — founder verified on production |
 | 2026-06-17 | `2a894d8` | Worker nav, session redirect, build stamp |
@@ -308,6 +309,6 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 ## 9. Next Recommended Action
 
-**For founder:** Run migration `013_sprint3_invite_seed.sql`. Test customer flow at `/request` with invite `ORAI2026`. Confirm job in Supabase `jobs` table.
+**For founder:** Run migration `014_sprint3_voice_media.sql`. Re-test: 5 photos, voice note, My Requests on `/track`, manual lookup fallback.
 
-**For agent:** Sprint 3 build complete. After founder live test passes, mark Sprint 3 ✅ and start **Sprint 4** (admin queue).
+**For agent:** After founder confirms UX re-test, mark Sprint 3 ✅ and start **Sprint 4** (admin queue).

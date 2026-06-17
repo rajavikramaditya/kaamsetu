@@ -46,7 +46,7 @@ export default async function Home() {
             href="/track"
             className="inline-flex h-12 items-center justify-center rounded-full border border-teal-700 px-6 text-sm font-medium text-teal-800"
           >
-            Track Job
+            My Requests
           </Link>
           {user ? (
             <Link
@@ -68,8 +68,8 @@ export default async function Home() {
         <div className="rounded-2xl border border-stone-200 bg-white p-6 text-sm text-stone-600">
           <p className="font-medium text-stone-900">Closed beta — Orai</p>
           <p className="mt-2">
-            Customers can submit service requests with an invite code and track jobs
-            without creating an account. Workers can log in to manage their profile.
+            Customers can submit service requests with an invite code. Saved requests stay
+            on this device — reopen anytime from My Requests without re-entering codes.
           </p>
           <Link
             href="/api/health"

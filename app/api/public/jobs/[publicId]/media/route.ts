@@ -1,7 +1,13 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { apiError, apiSuccess } from "@/lib/api/response";
-import { validateJobMediaFile } from "@/lib/validation/customer";
-import { uploadJobIssuePhoto } from "@/server/public/job-media";
+import {
+  validateJobMediaFile,
+  validateJobVoiceFile,
+} from "@/lib/validation/customer";
+import {
+  uploadJobIssuePhoto,
+  uploadJobVoiceNote,
+} from "@/server/public/job-media";
 import { verifyJobAccess } from "@/server/public/track-job";
 
 type RouteContext = { params: Promise<{ publicId: string }> };
@@ -14,6 +20,7 @@ export async function POST(request: Request, context: RouteContext) {
     const jobRef = String(formData.get("job_ref") ?? "").trim().toUpperCase();
     const phone = String(formData.get("phone") ?? "").replace(/\D/g, "").slice(-10);
     const trackCode = String(formData.get("track_code") ?? "").trim();
+    const mediaKind = String(formData.get("media_kind") ?? "issue_photo");
     const file = formData.get("file");
 
     if (!jobRef || !phone || !trackCode) {
@@ -21,17 +28,29 @@ export async function POST(request: Request, context: RouteContext) {
     }
 
     if (!(file instanceof File)) {
-      return apiError("VALIDATION_ERROR", "Photo file is required", 400);
+      return apiError("VALIDATION_ERROR", "File is required", 400);
     }
 
-    try {
-      validateJobMediaFile(file);
-    } catch {
-      return apiError(
-        "VALIDATION_ERROR",
-        "Photo must be JPEG, PNG, or WebP and under 5 MB",
-        400,
-      );
+    if (mediaKind === "issue_voice_note") {
+      try {
+        validateJobVoiceFile(file);
+      } catch {
+        return apiError(
+          "VALIDATION_ERROR",
+          "Voice note must be audio (WebM/OGG/MP4) and under 5 MB",
+          400,
+        );
+      }
+    } else {
+      try {
+        validateJobMediaFile(file);
+      } catch {
+        return apiError(
+          "VALIDATION_ERROR",
+          "Photo must be JPEG, PNG, or WebP and under 5 MB",
+          400,
+        );
+      }
     }
 
     const admin = createAdminClient();
@@ -40,12 +59,20 @@ export async function POST(request: Request, context: RouteContext) {
       return apiError("FORBIDDEN", "Invalid job credentials", 403);
     }
 
-    const mediaId = await uploadJobIssuePhoto(admin, access.job_id, file);
+    const mediaId =
+      mediaKind === "issue_voice_note"
+        ? await uploadJobVoiceNote(admin, access.job_id, file)
+        : await uploadJobIssuePhoto(admin, access.job_id, file);
 
-    return apiSuccess({ media_id: mediaId, uploaded_count: 1 });
+    return apiSuccess({ media_id: mediaId, media_kind: mediaKind, uploaded_count: 1 });
   } catch (error) {
-    if (error instanceof Error && error.message === "PHOTO_LIMIT") {
-      return apiError("VALIDATION_ERROR", "Maximum 3 photos per job", 400);
+    if (error instanceof Error) {
+      if (error.message === "PHOTO_LIMIT") {
+        return apiError("VALIDATION_ERROR", "Maximum 5 photos per job", 400);
+      }
+      if (error.message === "VOICE_LIMIT") {
+        return apiError("VALIDATION_ERROR", "Only one voice note allowed per job", 400);
+      }
     }
     const message = error instanceof Error ? error.message : "Upload failed";
     return apiError("INTERNAL_ERROR", message, 500);

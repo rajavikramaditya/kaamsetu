@@ -5,21 +5,50 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { CustomerShell } from "@/components/customer/CustomerShell";
+import { VoiceNoteRecorder } from "@/components/customer/VoiceNoteRecorder";
+import { compressImageFiles } from "@/lib/customer/compress-image";
 import { readCustomerSession } from "@/lib/customer/session";
+import { MAX_ISSUE_PHOTOS } from "@/lib/validation/customer";
+
+type Credentials = {
+  public_id: string;
+  job_ref: string;
+  phone: string;
+  track_code: string;
+};
+
+async function uploadMedia(
+  credentials: Credentials,
+  file: File,
+  mediaKind: "issue_photo" | "issue_voice_note",
+) {
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("job_ref", credentials.job_ref);
+  fd.append("phone", credentials.phone);
+  fd.append("track_code", credentials.track_code);
+  fd.append("media_kind", mediaKind);
+
+  const res = await fetch(`/api/public/jobs/${credentials.public_id}/media`, {
+    method: "POST",
+    body: fd,
+  });
+  const data = await res.json();
+  if (!data.success) {
+    throw new Error(data.error?.message ?? "Upload failed");
+  }
+}
 
 export default function RequestPhotosPage() {
   const router = useRouter();
-  const [credentials, setCredentials] = useState<{
-    public_id: string;
-    job_ref: string;
-    phone: string;
-    track_code: string;
-  } | null>(null);
-  const [file, setFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [uploaded, setUploaded] = useState(0);
+  const [credentials, setCredentials] = useState<Credentials | null>(null);
+  const [photosUploaded, setPhotosUploaded] = useState(0);
+  const [voiceUploaded, setVoiceUploaded] = useState(false);
+  const [compressing, setCompressing] = useState(false);
+  const [uploadingPhotos, setUploadingPhotos] = useState(false);
+  const [uploadingVoice, setUploadingVoice] = useState(false);
+  const [pendingVoice, setPendingVoice] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState(false);
 
   useEffect(() => {
     const session = readCustomerSession();
@@ -35,92 +64,125 @@ export default function RequestPhotosPage() {
     });
   }, [router]);
 
-  async function handleUpload(e: React.FormEvent) {
-    e.preventDefault();
-    if (!credentials || !file) return;
+  async function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!credentials) return;
+    const picked = Array.from(e.target.files ?? []);
+    if (picked.length === 0) return;
 
-    setUploading(true);
+    const remaining = MAX_ISSUE_PHOTOS - photosUploaded;
+    if (remaining <= 0) {
+      setError(`Maximum ${MAX_ISSUE_PHOTOS} photos allowed.`);
+      return;
+    }
+
+    const toUpload = picked.slice(0, remaining);
     setError(null);
+    setCompressing(true);
+    setUploadingPhotos(true);
 
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("job_ref", credentials.job_ref);
-      fd.append("phone", credentials.phone);
-      fd.append("track_code", credentials.track_code);
-
-      const res = await fetch(
-        `/api/public/jobs/${credentials.public_id}/media`,
-        { method: "POST", body: fd },
-      );
-      const data = await res.json();
-
-      if (!data.success) {
-        throw new Error(data.error?.message ?? "Upload failed");
+      const compressed = await compressImageFiles(toUpload);
+      let count = 0;
+      for (const file of compressed) {
+        if (photosUploaded + count >= MAX_ISSUE_PHOTOS) break;
+        await uploadMedia(credentials, file, "issue_photo");
+        count += 1;
       }
-
-      setUploaded((n) => n + 1);
-      setFile(null);
-      if (uploaded + 1 >= 3) setDone(true);
+      setPhotosUploaded((n) => n + count);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed");
+      setError(err instanceof Error ? err.message : "Photo upload failed");
     } finally {
-      setUploading(false);
+      setCompressing(false);
+      setUploadingPhotos(false);
+      e.target.value = "";
+    }
+  }
+
+  async function handleVoiceUpload() {
+    if (!credentials || !pendingVoice || voiceUploaded) return;
+    setUploadingVoice(true);
+    setError(null);
+    try {
+      await uploadMedia(credentials, pendingVoice, "issue_voice_note");
+      setVoiceUploaded(true);
+      setPendingVoice(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Voice upload failed");
+    } finally {
+      setUploadingVoice(false);
     }
   }
 
   if (!credentials) {
     return (
-      <CustomerShell title="Upload Photos" active="request">
+      <CustomerShell title="Add Photos & Voice" active="request">
         <p className="text-sm text-stone-600">Loading…</p>
       </CustomerShell>
     );
   }
 
+  const photosRemaining = MAX_ISSUE_PHOTOS - photosUploaded;
+  const photoLimitReached = photosRemaining <= 0;
+
   return (
-    <CustomerShell title="Upload Photos" active="request">
+    <CustomerShell title="Add Photos & Voice" active="request">
       <p className="text-sm text-stone-600">
-        Add up to 3 photos of the issue for job <strong>{credentials.job_ref}</strong>.
-        JPEG, PNG, or WebP — max 5 MB each.
+        Add up to {MAX_ISSUE_PHOTOS} photos and one optional voice note for job{" "}
+        <strong>{credentials.job_ref}</strong>. Images are compressed before upload.
       </p>
 
-      {uploaded > 0 && (
+      {photosUploaded > 0 && (
         <p className="rounded-xl bg-teal-50 px-4 py-3 text-sm text-teal-900">
-          {uploaded} photo{uploaded === 1 ? "" : "s"} uploaded.
+          {photosUploaded} photo{photosUploaded === 1 ? "" : "s"} uploaded.
         </p>
       )}
 
-      {!done && uploaded < 3 && (
-        <form onSubmit={handleUpload} className="flex flex-col gap-4">
-          <label className="flex flex-col gap-1 text-sm">
-            <span className="font-medium">Issue photo</span>
+      <div className="flex flex-col gap-3 rounded-2xl border border-stone-200 bg-white p-4">
+        <p className="text-sm font-medium text-stone-900">Issue photos</p>
+        {!photoLimitReached ? (
+          <label className="flex flex-col gap-2 text-sm">
+            <span className="text-stone-600">
+              Select one or more photos ({photosRemaining} remaining)
+            </span>
             <input
-              required
               type="file"
               accept="image/jpeg,image/png,image/webp"
-              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              multiple
+              disabled={compressing || uploadingPhotos}
+              onChange={handlePhotoSelect}
               className="text-sm"
             />
           </label>
+        ) : (
+          <p className="text-sm text-amber-900">Photo limit reached for this job.</p>
+        )}
+        {(compressing || uploadingPhotos) && (
+          <p className="text-sm text-stone-600">
+            {compressing ? "Compressing…" : "Uploading photos…"}
+          </p>
+        )}
+      </div>
 
-          {error && (
-            <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">{error}</p>
-          )}
+      <VoiceNoteRecorder
+        disabled={voiceUploaded || uploadingVoice}
+        uploading={uploadingVoice}
+        uploaded={voiceUploaded}
+        onRecorded={(file) => setPendingVoice(file)}
+      />
 
-          <button
-            type="submit"
-            disabled={uploading || !file}
-            className="rounded-full bg-teal-700 px-6 py-3 text-sm font-medium text-white disabled:opacity-60"
-          >
-            {uploading ? "Uploading…" : "Upload photo"}
-          </button>
-        </form>
+      {pendingVoice && !voiceUploaded && (
+        <button
+          type="button"
+          disabled={uploadingVoice}
+          onClick={handleVoiceUpload}
+          className="rounded-full bg-teal-700 px-6 py-3 text-sm font-medium text-white disabled:opacity-60"
+        >
+          {uploadingVoice ? "Uploading…" : "Upload voice note"}
+        </button>
       )}
 
-      {(done || uploaded >= 3) && (
-        <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          Photo limit reached for this job.
-        </p>
+      {error && (
+        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">{error}</p>
       )}
 
       <Link

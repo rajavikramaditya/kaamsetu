@@ -38,7 +38,7 @@ export function CustomerShell({ title, children, active }: CustomerShellProps) {
                   : "text-teal-700 underline-offset-4 hover:underline"
               }
             >
-              Track Job
+              My Requests
             </Link>
           </nav>
         </div>

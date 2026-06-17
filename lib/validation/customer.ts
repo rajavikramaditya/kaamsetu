@@ -51,14 +51,33 @@ export const trackJobSchema = z.object({
     .regex(/^\d{6}$/, "Track code must be 6 digits"),
 });
 
-const MAX_FILE_BYTES = 5 * 1024 * 1024;
-const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
+const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+const MAX_VOICE_BYTES = 5 * 1024 * 1024;
+const ALLOWED_PHOTO_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
+const ALLOWED_VOICE_MIME = new Set([
+  "audio/webm",
+  "audio/ogg",
+  "audio/mp4",
+  "audio/mpeg",
+  "audio/aac",
+]);
+
+export const MAX_ISSUE_PHOTOS = 5;
 
 export function validateJobMediaFile(file: File) {
-  if (!ALLOWED_MIME.has(file.type)) {
+  if (!ALLOWED_PHOTO_MIME.has(file.type)) {
     throw new Error("INVALID_MIME");
   }
-  if (file.size <= 0 || file.size > MAX_FILE_BYTES) {
+  if (file.size <= 0 || file.size > MAX_PHOTO_BYTES) {
+    throw new Error("INVALID_SIZE");
+  }
+}
+
+export function validateJobVoiceFile(file: File) {
+  if (!ALLOWED_VOICE_MIME.has(file.type)) {
+    throw new Error("INVALID_MIME");
+  }
+  if (file.size <= 0 || file.size > MAX_VOICE_BYTES) {
     throw new Error("INVALID_SIZE");
   }
 }

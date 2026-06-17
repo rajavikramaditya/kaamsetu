@@ -9,6 +9,7 @@ import {
   patchCustomerSession,
   readCustomerSession,
 } from "@/lib/customer/session";
+import { saveRequestToDevice } from "@/lib/customer/saved-requests";
 
 type BootstrapCategory = {
   id: string;
@@ -117,6 +118,21 @@ export default function NewRequestPage() {
         public_id: data.public_id,
         track_code: data.track_code,
         phone: form.phone.replace(/\D/g, "").slice(-10),
+      });
+
+      const categoryName =
+        categories.find((c) => c.id === form.service_category_id)?.name_en ?? "Service";
+      const localityName =
+        localities.find((l) => l.id === form.locality_id)?.name ?? "Locality";
+
+      saveRequestToDevice({
+        job_ref: data.job_ref,
+        public_id: data.public_id,
+        track_code: data.track_code,
+        phone: form.phone.replace(/\D/g, "").slice(-10),
+        category: categoryName,
+        locality: localityName,
+        created_at: new Date().toISOString(),
       });
 
       router.push("/request/success");
