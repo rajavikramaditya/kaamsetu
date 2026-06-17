@@ -6,6 +6,9 @@ import {
   VOICE_UNSUPPORTED_MESSAGE,
   createVoiceMediaRecorder,
   isVoiceRecordingSupported,
+  mapGetUserMediaError,
+  mapRecorderSetupError,
+  queryMicrophonePermission,
   voiceBlobToFile,
 } from "@/lib/customer/voice-recorder";
 
@@ -29,12 +32,17 @@ export function VoiceNoteRecorder({
   const [error, setError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [supported] = useState(() => isVoiceRecordingSupported());
+  const [micPermission, setMicPermission] = useState<PermissionState | "unknown">("unknown");
 
   const recorderRef = useRef<MediaRecorder | null>(null);
   const mimeTypeRef = useRef("audio/webm");
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    void queryMicrophonePermission().then(setMicPermission);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -61,12 +69,25 @@ export function VoiceNoteRecorder({
       return;
     }
 
+    const permission = await queryMicrophonePermission();
+    setMicPermission(permission);
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
       chunksRef.current = [];
 
-      const { recorder, mimeType } = createVoiceMediaRecorder(stream);
+      let recorder: MediaRecorder;
+      let mimeType: string;
+      try {
+        ({ recorder, mimeType } = createVoiceMediaRecorder(stream));
+      } catch (setupErr) {
+        cleanupStream();
+        setError(mapRecorderSetupError(setupErr));
+        setStatus("idle");
+        return;
+      }
+
       mimeTypeRef.current = mimeType;
       recorderRef.current = recorder;
 
@@ -76,14 +97,14 @@ export function VoiceNoteRecorder({
 
       recorder.onerror = () => {
         cleanupStream();
-        setError("Recording failed. Try again or submit without voice.");
+        setError("Recording failed. Try again or continue without voice.");
         setStatus("idle");
       };
 
       recorder.onstop = () => {
         cleanupStream();
         if (chunksRef.current.length === 0) {
-          setError("Recording failed. Try again or submit without voice.");
+          setError("Recording failed. Try again or continue without voice.");
           setStatus("idle");
           return;
         }
@@ -93,7 +114,7 @@ export function VoiceNoteRecorder({
         });
 
         if (blob.size === 0) {
-          setError("Recording failed. Try again or submit without voice.");
+          setError("Recording failed. Try again or continue without voice.");
           setStatus("idle");
           return;
         }
@@ -105,12 +126,14 @@ export function VoiceNoteRecorder({
           return url;
         });
         setStatus("recorded");
+        setError(null);
         onRecorded(file);
       };
 
       recorder.start(250);
       setStatus("recording");
       setSeconds(0);
+      setMicPermission("granted");
 
       timerRef.current = setInterval(() => {
         setSeconds((s) => {
@@ -124,15 +147,10 @@ export function VoiceNoteRecorder({
       }, 1000);
     } catch (err) {
       cleanupStream();
-      const denied =
-        err instanceof DOMException &&
-        (err.name === "NotAllowedError" || err.name === "PermissionDeniedError");
-      setError(
-        denied
-          ? "Microphone permission denied. You can submit without voice."
-          : "Could not start recording. You can submit without voice.",
-      );
+      setError(mapGetUserMediaError(err));
       setStatus("idle");
+      const latest = await queryMicrophonePermission();
+      setMicPermission(latest);
     }
   }
 
@@ -181,6 +199,10 @@ export function VoiceNoteRecorder({
         </p>
       )}
 
+      {supported && micPermission === "granted" && status === "idle" && !error && (
+        <p className="text-xs text-teal-700">Microphone access is allowed for this site.</p>
+      )}
+
       {status === "recording" && (
         <p className="text-sm font-medium text-red-700">
           Recording… {seconds}s / {MAX_SECONDS}s
@@ -198,14 +220,16 @@ export function VoiceNoteRecorder({
       {supported && (
         <div className="flex flex-wrap gap-2">
           {status === "idle" && (
-            <button
-              type="button"
-              disabled={disabled || uploading}
-              onClick={startRecording}
-              className="rounded-full bg-stone-800 px-5 py-2.5 text-sm font-medium text-white disabled:opacity-60"
-            >
-              Record voice note
-            </button>
+            <>
+              <button
+                type="button"
+                disabled={disabled || uploading}
+                onClick={startRecording}
+                className="rounded-full bg-stone-800 px-5 py-2.5 text-sm font-medium text-white disabled:opacity-60"
+              >
+                {error ? "Try recording again" : "Record voice note"}
+              </button>
+            </>
           )}
 
           {status === "recording" && (

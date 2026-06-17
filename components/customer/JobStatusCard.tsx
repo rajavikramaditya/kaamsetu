@@ -71,6 +71,45 @@ export function JobStatusCard({ job }: { job: JobStatus }) {
   );
 }
 
+export function PhoneJobSummaryCard({
+  job,
+  loading,
+  onOpen,
+}: {
+  job: {
+    job_ref: string;
+    booking_status: string;
+    service_category: string | null;
+    locality: string | null;
+    created_at: string;
+  };
+  loading?: boolean;
+  onOpen: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      disabled={loading}
+      className="flex w-full flex-col gap-1 rounded-2xl border border-stone-200 bg-white p-4 text-left transition hover:border-teal-300 disabled:opacity-60"
+    >
+      <div className="flex items-center justify-between gap-2">
+        <span className="font-semibold text-stone-900">{job.job_ref}</span>
+        <span className="rounded-full bg-teal-100 px-2 py-0.5 text-xs font-medium text-teal-900">
+          {statusLabel(job.booking_status)}
+        </span>
+      </div>
+      <p className="text-sm text-stone-600">
+        {[job.service_category, job.locality].filter(Boolean).join(" · ") || "Service request"}
+      </p>
+      <p className="text-xs text-teal-700">{loading ? "Loading…" : "View details →"}</p>
+      <p className="text-xs text-stone-400">
+        {new Date(job.created_at).toLocaleString("en-IN")}
+      </p>
+    </button>
+  );
+}
+
 export function SavedRequestCard({
   request,
   loading,

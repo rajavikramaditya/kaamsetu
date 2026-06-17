@@ -132,9 +132,11 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 | 3.4 | Track job + device saved requests | ✅ | Build |
 
 **Sprint 3 exit criteria:** Customer creates request · job appears in admin queue  
-**Sprint 3 status:** 🟡 Live test passed — UX corrections pushed (`KS-S3-customer-flow`)
+**Sprint 3 status:** 🟡 Live testing — final UX blockers fixed (`KS-S3-customer-flow`)
 
-**UX corrections:** Multi-photo compression, optional 60s voice note, localStorage saved requests ("My Requests"), manual track fallback. No customer login.
+**Tracking paths:** (1) My Requests on device (2) mobile number lookup for other phone (3) advanced job ref + track code backup
+
+**Latest fixes:** Photos page "View this request" CTA · voice permission retry · `/api/public/jobs/by-phone`
 
 **Sprint 3 locked decisions (implemented):**
 
@@ -143,7 +145,7 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 | 1 | **Required at submit:** name, mobile, service, locality only |
 | 2 | Address, description, photos, voice — all optional |
 | 3 | Up to 5 client-compressed photos; 1 optional 60s voice note |
-| 4 | No customer login — `localStorage` saved requests + manual track fallback |
+| 4 | No customer login — localStorage + **mobile lookup** + advanced fallback |
 | 5 | PWA installable app experience |
 
 **Migrations:** `013` invite seed · `014` voice media · `015` optional job fields (founder: run 015 if minimal submit fails)
@@ -306,7 +308,8 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Date | Checkpoint | Change |
 |---|---|---|
-| 2026-06-17 | `KS-S3-customer-flow` fix | Minimal required fields, voice recorder repair, saved request auto-load |
+| 2026-06-17 | `KS-S3-customer-flow` fix | Media page CTA, voice retry, mobile lookup tracking |
+| 2026-06-17 | `KS-S3-customer-flow` fix | Minimal required fields, voice recorder, saved request auto-load |
 | 2026-06-17 | `KS-S3-customer-flow` docs | Governance alignment: media limits, saved requests, PWA, no customer login |
 | 2026-06-17 | `KS-S3-customer-flow` UX | Multi-photo compression, voice note, saved requests on device |
 | 2026-06-17 | `KS-S3-customer-flow` build | Customer invite gate, request form, photo upload, track job; migration 013 invite seed |
@@ -321,6 +324,6 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 ## 9. Next Recommended Action
 
-**For founder:** Run migration `015_sprint3_optional_job_fields.sql` if not done. Re-test: minimal submit (name+phone+service+locality only), tap saved request on `/track`, voice note on supported browser.
+**For founder:** Re-test photos page → "View this request", mobile lookup in incognito, voice "Try recording again", advanced fallback.
 
-**For agent:** Sprint 3 corrections complete. After founder re-test passes, mark Sprint 3 ✅ — do not start Sprint 4 until founder confirms.
+**For agent:** Do not start Sprint 4 until founder marks Sprint 3 ✅.

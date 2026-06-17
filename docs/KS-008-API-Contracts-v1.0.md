@@ -240,6 +240,62 @@ Note: Legacy path `POST /api/public/track` is superseded by `/api/public/jobs/lo
 
 ---
 
+## POST /api/public/jobs/by-phone
+
+Purpose:
+List recent requests for a mobile number (other-device tracking). Does **not** return `track_code`.
+
+Request
+
+```json
+{
+  "phone": "9999999999"
+}
+```
+
+Response
+
+```json
+{
+  "success": true,
+  "jobs": [
+    {
+      "public_id": "uuid",
+      "job_ref": "KS-000001",
+      "booking_status": "requested",
+      "dispatch_status": "not_started",
+      "payment_status": "not_due",
+      "service_category": "Plumber",
+      "locality": "Indira Nagar",
+      "requested_at": "2026-06-17T00:00:00Z",
+      "created_at": "2026-06-17T00:00:00Z"
+    }
+  ]
+}
+```
+
+Rules: max 10 results, last 90 days, 10-digit mobile validation.
+
+---
+
+## POST /api/public/jobs/lookup-by-phone
+
+Purpose:
+View job detail when customer verifies with mobile + job ref (no track code).
+
+Request
+
+```json
+{
+  "phone": "9999999999",
+  "job_ref": "KS-000001"
+}
+```
+
+Response: same shape as `/api/public/jobs/lookup` `job` object. No `track_code` in response.
+
+---
+
 ## POST /api/public/track (deprecated)
 
 Superseded by `POST /api/public/jobs/lookup`. Kept for reference only.

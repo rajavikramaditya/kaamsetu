@@ -7,7 +7,9 @@ import Link from "next/link";
 import { CustomerShell } from "@/components/customer/CustomerShell";
 import { VoiceNoteRecorder } from "@/components/customer/VoiceNoteRecorder";
 import { compressImageFiles } from "@/lib/customer/compress-image";
+import { findSavedRequest } from "@/lib/customer/saved-requests";
 import { readCustomerSession } from "@/lib/customer/session";
+import { buildTrackFallbackUrl, buildTrackOpenUrl } from "@/lib/customer/track-url";
 import { MAX_ISSUE_PHOTOS } from "@/lib/validation/customer";
 
 type Credentials = {
@@ -39,9 +41,22 @@ async function uploadMedia(
   }
 }
 
+function resolveTrackUrls(credentials: Credentials) {
+  const saved = findSavedRequest(credentials.job_ref);
+  if (saved) {
+    const href = buildTrackOpenUrl(credentials.job_ref, credentials.phone);
+    return { primary: href, secondary: href };
+  }
+  return {
+    primary: buildTrackOpenUrl(credentials.job_ref, credentials.phone),
+    secondary: buildTrackFallbackUrl(credentials.job_ref, credentials.phone),
+  };
+}
+
 export default function RequestPhotosPage() {
   const router = useRouter();
   const [credentials, setCredentials] = useState<Credentials | null>(null);
+  const [trackUrls, setTrackUrls] = useState({ primary: "/track", secondary: "/track" });
   const [photosUploaded, setPhotosUploaded] = useState(0);
   const [voiceUploaded, setVoiceUploaded] = useState(false);
   const [compressing, setCompressing] = useState(false);
@@ -56,12 +71,14 @@ export default function RequestPhotosPage() {
       router.replace("/track");
       return;
     }
-    setCredentials({
+    const creds = {
       public_id: session.public_id,
       job_ref: session.job_ref,
       phone: session.phone,
       track_code: session.track_code,
-    });
+    };
+    setCredentials(creds);
+    setTrackUrls(resolveTrackUrls(creds));
   }, [router]);
 
   async function handlePhotoSelect(e: React.ChangeEvent<HTMLInputElement>) {
@@ -127,8 +144,8 @@ export default function RequestPhotosPage() {
   return (
     <CustomerShell title="Add Photos & Voice" active="request">
       <p className="text-sm text-stone-600">
-        Add up to {MAX_ISSUE_PHOTOS} photos and one optional voice note for job{" "}
-        <strong>{credentials.job_ref}</strong>. Images are compressed before upload.
+        Optional: add up to {MAX_ISSUE_PHOTOS} photos and one voice note for job{" "}
+        <strong>{credentials.job_ref}</strong>. When you are done, view your request status.
       </p>
 
       {photosUploaded > 0 && (
@@ -138,7 +155,7 @@ export default function RequestPhotosPage() {
       )}
 
       <div className="flex flex-col gap-3 rounded-2xl border border-stone-200 bg-white p-4">
-        <p className="text-sm font-medium text-stone-900">Issue photos</p>
+        <p className="text-sm font-medium text-stone-900">Issue photos (optional)</p>
         {!photoLimitReached ? (
           <label className="flex flex-col gap-2 text-sm">
             <span className="text-stone-600">
@@ -185,12 +202,20 @@ export default function RequestPhotosPage() {
         <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-800">{error}</p>
       )}
 
-      <Link
-        href="/track"
-        className="text-center text-sm text-teal-700 underline-offset-4 hover:underline"
-      >
-        Track job status →
-      </Link>
+      <div className="flex flex-col gap-3 border-t border-stone-200 pt-4">
+        <Link
+          href={trackUrls.primary}
+          className="inline-flex items-center justify-center rounded-full bg-teal-700 px-6 py-3 text-sm font-medium text-white"
+        >
+          View this request
+        </Link>
+        <Link
+          href={trackUrls.secondary}
+          className="text-center text-sm text-teal-700 underline-offset-4 hover:underline"
+        >
+          Skip and track job
+        </Link>
+      </div>
     </CustomerShell>
   );
 }

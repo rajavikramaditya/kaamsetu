@@ -51,6 +51,15 @@ export const trackJobSchema = z.object({
     .regex(/^\d{6}$/, "Track code must be 6 digits"),
 });
 
+export const phoneJobsLookupSchema = z.object({
+  phone: phoneSchema,
+});
+
+export const phoneJobDetailSchema = z.object({
+  phone: phoneSchema,
+  job_ref: z.string().trim().toUpperCase().regex(/^KS-\d{6}$/),
+});
+
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 const MAX_VOICE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_PHOTO_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
