@@ -121,7 +121,7 @@ function AdminLoginContent() {
   }
 
   return (
-    <AdminShell title="Admin Login">
+    <AdminShell title="Admin Login" showNav={false}>
       <p className="text-sm text-stone-600">
         Founder login with Email OTP. Your Supabase user must have{" "}
         <code className="text-xs">app_metadata.role = admin</code>.
@@ -212,7 +212,13 @@ function AdminLoginContent() {
 
 export default function AdminLoginPage() {
   return (
-    <Suspense fallback={<AdminShell title="Admin Login"><p className="text-sm text-stone-600">Loading…</p></AdminShell>}>
+    <Suspense
+      fallback={
+        <AdminShell title="Admin Login" showNav={false}>
+          <p className="text-sm text-stone-600">Loading…</p>
+        </AdminShell>
+      }
+    >
       <AdminLoginContent />
     </Suspense>
   );
