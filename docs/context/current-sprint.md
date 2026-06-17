@@ -10,6 +10,7 @@ Founder/admin control panel for customer requests and worker profiles.
 | Deliverable | Status |
 |---|---|
 | Admin login + auth guard (`role=admin`) | ✅ Built |
+| Auth callback routing (admin vs worker) | ✅ Fixed |
 | Dashboard metrics | ✅ Built |
 | Job/request queue | ✅ Built |
 | Job detail (customer, photos, voice) | ✅ Built |

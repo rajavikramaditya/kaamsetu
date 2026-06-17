@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { WorkerShell } from "@/components/worker/WorkerShell";
-import { createClient } from "@/lib/supabase/client";
+import { clientSignOut } from "@/lib/auth/client-auth";
 
 type MeResponse = {
   success: boolean;
@@ -74,10 +74,7 @@ export default function WorkerDashboardPage() {
   }
 
   async function logout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/worker/login");
-    router.refresh();
+    await clientSignOut("/worker/login");
   }
 
   if (loading) {

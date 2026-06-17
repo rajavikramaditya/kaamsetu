@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
-import { createClient } from "@/lib/supabase/client";
+import { clientSignOut } from "@/lib/auth/client-auth";
 
 type AdminShellProps = {
   title: string;
@@ -12,13 +11,8 @@ type AdminShellProps = {
 };
 
 export function AdminShell({ title, children, active }: AdminShellProps) {
-  const router = useRouter();
-
   async function logout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/admin/login");
-    router.refresh();
+    await clientSignOut("/admin/login");
   }
 
   return (

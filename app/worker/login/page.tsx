@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { PhoneOtpLogin } from "@/components/worker/PhoneOtpLogin";
 import { WorkerShell } from "@/components/worker/WorkerShell";
+import { authCallbackErrorMessage, authCallbackRedirectTo } from "@/lib/auth/client-auth";
 import { createClient } from "@/lib/supabase/client";
 
 type LoginMethod = "email" | "phone";
@@ -18,13 +19,23 @@ function formatAuthError(message: string): string {
 }
 
 export default function WorkerLoginPage() {
+  return (
+    <Suspense fallback={<WorkerShell title="Login"><p className="text-sm text-stone-600">Loading…</p></WorkerShell>}>
+      <WorkerLoginContent />
+    </Suspense>
+  );
+}
+
+function WorkerLoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackError = authCallbackErrorMessage(searchParams.get("error"));
   const [method, setMethod] = useState<LoginMethod>("email");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState<"email" | "otp">("email");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(callbackError);
 
   useEffect(() => {
     fetch("/api/worker/me")
@@ -59,7 +70,7 @@ export default function WorkerLoginPage() {
       const trimmed = email.trim().toLowerCase();
       if (!trimmed.includes("@")) throw new Error("Enter a valid email address");
       const supabase = createClient();
-      const redirectTo = `${window.location.origin}/auth/callback`;
+      const redirectTo = authCallbackRedirectTo("/worker/dashboard");
       const { error: otpError } = await supabase.auth.signInWithOtp({
         email: trimmed,
         options: {

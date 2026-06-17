@@ -180,6 +180,7 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 - `/admin/workers` — worker list with status filter
 - `/admin/workers/[id]` — profile review, Aadhaar/docs, approve / reject / suspend
 - Admin APIs: `/api/admin/me`, `dashboard`, `jobs`, `workers`, worker actions
+- Auth callback routing — admin/worker OTP links redirect to correct dashboards; sign-out fixed
 
 **Not in Sprint 4 (deferred):** Dispatch assign/offer (Sprint 5), assisted booking form, admin job status edits
 
@@ -328,6 +329,7 @@ Progress key: ⬜ Not started · 🟡 In progress · ✅ Done · ⏸ Blocked
 
 | Date | Checkpoint | Change |
 |---|---|---|
+| 2026-06-17 | `KS-S4-admin-operations` fix | Separate admin/worker auth callback routing + sign-out |
 | 2026-06-17 | `KS-S4-admin-operations` build | Admin login, dashboard, job queue, worker approval UI + APIs; `npm run build` OK |
 | 2026-06-17 | `KS-S3-customer-flow` **LIVE** | Mobile PWA customer flow verified — request, media, tracking complete |
 | 2026-06-17 | `KS-S3-customer-flow` fix | Media page CTA, voice retry, mobile lookup tracking |

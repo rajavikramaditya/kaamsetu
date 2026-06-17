@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { AdminShell } from "@/components/admin/AdminShell";
+import { authCallbackErrorMessage, authCallbackRedirectTo, clientSignOut } from "@/lib/auth/client-auth";
 import { createClient } from "@/lib/supabase/client";
 
 function formatAuthError(message: string): string {
@@ -14,21 +15,39 @@ function formatAuthError(message: string): string {
   return message;
 }
 
-export default function AdminLoginPage() {
+function AdminLoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackError = authCallbackErrorMessage(searchParams.get("error"));
+
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState<"email" | "otp">("email");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [signingOut, setSigningOut] = useState(false);
+  const [error, setError] = useState<string | null>(callbackError);
+  const [workerSessionEmail, setWorkerSessionEmail] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/admin/me")
-      .then((res) => res.json())
-      .then((me) => {
-        if (me.success) router.replace("/admin/dashboard");
-      })
-      .catch(() => undefined);
+    async function checkSession() {
+      const [adminRes, workerRes] = await Promise.all([
+        fetch("/api/admin/me"),
+        fetch("/api/worker/me"),
+      ]);
+      const admin = await adminRes.json();
+      const worker = await workerRes.json();
+
+      if (admin.success) {
+        router.replace("/admin/dashboard");
+        return;
+      }
+
+      if (worker.success) {
+        setWorkerSessionEmail(worker.profile?.phone ? `worker (${worker.profile.worker_code})` : "worker");
+      }
+    }
+
+    checkSession().catch(() => undefined);
   }, [router]);
 
   async function afterAuthSuccess() {
@@ -44,6 +63,17 @@ export default function AdminLoginPage() {
     router.refresh();
   }
 
+  async function handleSignOut() {
+    setSigningOut(true);
+    setError(null);
+    try {
+      await clientSignOut("/admin/login");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Sign out failed");
+      setSigningOut(false);
+    }
+  }
+
   async function sendEmailOtp(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -52,7 +82,7 @@ export default function AdminLoginPage() {
       const trimmed = email.trim().toLowerCase();
       if (!trimmed.includes("@")) throw new Error("Enter a valid email address");
       const supabase = createClient();
-      const redirectTo = `${window.location.origin}/auth/callback`;
+      const redirectTo = authCallbackRedirectTo("/admin/dashboard");
       const { error: otpError } = await supabase.auth.signInWithOtp({
         email: trimmed,
         options: {
@@ -97,6 +127,23 @@ export default function AdminLoginPage() {
         <code className="text-xs">app_metadata.role = admin</code>.
       </p>
 
+      {workerSessionEmail && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          <p className="font-medium">Signed in as a worker account</p>
+          <p className="mt-1 text-amber-900">
+            Admin and worker sessions cannot be mixed. Sign out before logging in as admin.
+          </p>
+          <button
+            type="button"
+            disabled={signingOut}
+            onClick={() => void handleSignOut()}
+            className="mt-3 rounded-full bg-amber-800 px-4 py-2 text-sm font-medium text-white disabled:opacity-60"
+          >
+            {signingOut ? "Signing out…" : "Sign out worker session"}
+          </button>
+        </div>
+      )}
+
       {step === "email" ? (
         <form onSubmit={sendEmailOtp} className="flex flex-col gap-4">
           <label className="flex flex-col gap-1 text-sm">
@@ -114,7 +161,7 @@ export default function AdminLoginPage() {
           </label>
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || Boolean(workerSessionEmail)}
             className="rounded-full bg-amber-800 px-4 py-3 font-medium text-white disabled:opacity-60"
           >
             {loading ? "Sending…" : "Send Email OTP"}
@@ -160,5 +207,13 @@ export default function AdminLoginPage() {
         <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
       )}
     </AdminShell>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={<AdminShell title="Admin Login"><p className="text-sm text-stone-600">Loading…</p></AdminShell>}>
+      <AdminLoginContent />
+    </Suspense>
   );
 }
